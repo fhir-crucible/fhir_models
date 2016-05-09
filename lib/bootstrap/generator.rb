@@ -57,6 +57,23 @@ module FHIR
         Dir.glob(File.join(@lib,'fhir','**','*')).each{|f|File.delete(f) if !File.directory?(f)}
       end
 
+      def self.generated?
+        lib = File.expand_path '..', File.dirname(File.absolute_path(__FILE__))
+        value_set_file = File.join(lib, 'fhir', 'resources', 'ValueSet.rb')
+        File.exists?(value_set_file)
+      end
+
+      def self.generate!
+        generator = self.new
+        generator.generate!
+      end
+
+      def generate!
+        generate_metadata
+        generate_types
+        generate_resources
+      end
+
       def generate_metadata
         template = FHIR::Boot::Template.new([],true)
         
