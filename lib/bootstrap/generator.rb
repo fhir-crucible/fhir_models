@@ -12,6 +12,24 @@ module FHIR
       # templates keeps track of all the templates in context within a given StructureDefinition
       attr_accessor :templates
 
+      def self.lib
+        File.expand_path '..', File.dirname(File.absolute_path(__FILE__))
+      end
+
+      def self.generated?
+        # Just want to do a basic check to see if models have been generated
+        File.exists?(File.join(lib, 'fhir', 'metadata.rb')) &&
+          Dir.exists?(File.join(lib, 'fhir', 'types')) &&
+          Dir.exists?(File.join(lib, 'fhir', 'resources'))
+      end
+
+      def self.generate!
+        generator = self.new
+        generator.generate_metadata
+        generator.generate_types
+        generator.generate_resources
+      end
+
       def initialize    
         defns = File.expand_path '../../definitions',File.dirname(File.absolute_path(__FILE__))
 
@@ -47,7 +65,7 @@ module FHIR
         @templates = []
 
         # make folders for generated content if they do not exist
-        @lib = File.expand_path '..', File.dirname(File.absolute_path(__FILE__))
+        @lib = self.class.lib
         Dir.mkdir(File.join(@lib,'fhir')) if !Dir.exists?(File.join(@lib,'fhir'))
         Dir.mkdir(File.join(@lib,'fhir','types')) if !Dir.exists?(File.join(@lib,'fhir','types'))
         Dir.mkdir(File.join(@lib,'fhir','resources')) if !Dir.exists?(File.join(@lib,'fhir','resources'))
@@ -55,23 +73,6 @@ module FHIR
         # delete previously generated folder contents
         Dir.glob(File.join(@lib,'fhir','*')).each{|f|File.delete(f) if !File.directory?(f)}
         Dir.glob(File.join(@lib,'fhir','**','*')).each{|f|File.delete(f) if !File.directory?(f)}
-      end
-
-      def self.generated?
-        lib = File.expand_path '..', File.dirname(File.absolute_path(__FILE__))
-        value_set_file = File.join(lib, 'fhir', 'resources', 'ValueSet.rb')
-        File.exists?(value_set_file)
-      end
-
-      def self.generate!
-        generator = self.new
-        generator.generate!
-      end
-
-      def generate!
-        generate_metadata
-        generate_types
-        generate_resources
       end
 
       def generate_metadata
