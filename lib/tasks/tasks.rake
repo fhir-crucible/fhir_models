@@ -7,18 +7,7 @@ namespace :fhir do
 
   desc 'generate fhir models'
   task :generate, [] do |t, args|
-    # create a generator and load the definitions
-    generator = FHIR::Boot::Generator.new
-    # 1. generate the lists of primitive data types, complex types, and resources
-    generator.generate_metadata
-    # 2. generate the complex data types
-    generator.generate_types
-    # 3. generate the base Resources
-    generator.generate_resources
-    # 4. generate extensions?
-
-    # 5. generate profiles?
-
+    FHIR::Boot::Generator.generate!
   end
 
   desc 'preprocess definitions'
