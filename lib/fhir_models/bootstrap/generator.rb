@@ -98,7 +98,7 @@ module FHIR
 
       def generate_class(hierarchy, structure_def, top_level = false)
         type_name = structure_def['id']
-        constrained_type = structure_def['constrained_type']
+        constrained_type = structure_def['type']
         path_type = type_name
         path_type = constrained_type if constrained_type
 
