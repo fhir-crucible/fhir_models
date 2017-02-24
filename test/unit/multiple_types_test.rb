@@ -52,11 +52,24 @@ class MultipleTypesTest < Test::Unit::TestCase
 
     obs.valuePeriod = FLAG
     assert (obs.value == obs.valuePeriod), 'Observation.value did not return valuePeriod'
+
+    # check memory
+    before = check_memory
+    obs = nil
+    wait_for_gc
+    after = check_memory
+    assert_memory(before, after)
   end
 
   def test_non_existing_multiple_types
     obs = FHIR::Observation.new
     assert ((obs.foo rescue FLAG) == FLAG), 'Observation.foo should not exist'
+    # check memory
+    before = check_memory
+    obs = nil
+    wait_for_gc
+    after = check_memory
+    assert_memory(before, after)
   end
 
   def test_multiple_cardinality
@@ -67,5 +80,11 @@ class MultipleTypesTest < Test::Unit::TestCase
         assert((!value.nil? && value.is_a?(Array) && value.empty?), "Observation.#{key} should be an empty Array.")
       end
     end
+    # check memory
+    before = check_memory
+    obs = nil
+    wait_for_gc
+    after = check_memory
+    assert_memory(before, after)
   end
 end

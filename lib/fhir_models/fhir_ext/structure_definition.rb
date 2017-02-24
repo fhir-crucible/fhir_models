@@ -190,7 +190,7 @@ module FHIR
         # get the data type definition to fill in the details
         # assume missing elements are from first data type (gross)
         next if elem.type.nil? || elem.type.empty?
-        type_def = FHIR::Definitions.get_type_definition(elem.type[0].code)
+        type_def = FHIR::Definitions.type_definition(elem.type[0].code)
         next if type_def.nil?
         type_elements = Array.new(type_def.snapshot.element)
         # _DEEP_ copy
@@ -452,7 +452,7 @@ module FHIR
                   unless element.binding.nil?
                     matching_type += check_binding(element, value)
                   end
-                elsif data_type_code == 'CodeableConcept' && !element.pattern.nil? && element.pattern.type == 'CodeableConcept'
+                elsif data_type_code == 'CodeableConcept' && !element.pattern.nil? && element.pattern.is_a?(FHIR::CodeableConcept)
                   # TODO: check that the CodeableConcept matches the defined pattern
                   @warnings << "Ignoring defined patterns on CodeableConcept #{element.path}"
                 elsif data_type_code == 'String' && !element.maxLength.nil? && (value.size > element.maxLength)
@@ -581,7 +581,7 @@ module FHIR
         # Eliminate endless loop on Element is an Element
         return true if data_type_code == 'Element' && id == 'Element'
 
-        definition = FHIR::Definitions.get_type_definition(data_type_code)
+        definition = FHIR::Definitions.type_definition(data_type_code)
         definition = FHIR::Definitions.get_resource_definition(data_type_code) if definition.nil?
         if !definition.nil?
           ret_val = false

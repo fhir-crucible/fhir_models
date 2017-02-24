@@ -62,5 +62,11 @@ class XmlSchemaValidationTest < Test::Unit::TestCase
     end
 
     assert errors_output.empty? || original_errors, "Schema Validation errors: \n #{errors_output.join('\n')}"
+    # check memory
+    before = check_memory
+    resource = nil
+    wait_for_gc
+    after = check_memory
+    assert_memory(before, after)
   end
 end

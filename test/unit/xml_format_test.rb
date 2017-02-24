@@ -44,6 +44,12 @@ class XmlFormatTest < Test::Unit::TestCase
     end
 
     assert errors.empty?, 'Differences in generated XML vs original'
+    # check memory
+    before = check_memory
+    resource = nil
+    wait_for_gc
+    after = check_memory
+    assert_memory(before, after)
   end
 
   def run_xml_json_xml_lossiness_test(example_file, example_name)
@@ -67,6 +73,13 @@ class XmlFormatTest < Test::Unit::TestCase
     end
 
     assert errors.empty?, 'Differences in generated XML vs original'
+    # check memory
+    before = check_memory
+    resource_from_xml = nil
+    resource_from_json = nil
+    wait_for_gc
+    after = check_memory
+    assert_memory(before, after)
   end
 
   def calculate_errors(input_nodes, output_nodes)

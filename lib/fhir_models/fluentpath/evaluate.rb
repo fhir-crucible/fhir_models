@@ -273,7 +273,7 @@ module FluentPath
             clean_index(tree, previous_index)
           when :count
             tree[index] = 0
-            tree[index] = 1 unless previous_node.nil?
+            tree[index] = 1 unless previous_node == :null || previous_node.nil?
             tree[index] = previous_node.length if previous_node.is_a?(Array)
             clean_index(tree, previous_index)
           when :empty

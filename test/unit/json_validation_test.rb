@@ -28,5 +28,11 @@ class JsonValidationTest < Test::Unit::TestCase
       File.open("#{ERROR_DIR}/#{example_name}.json", 'w:UTF-8') { |file| file.write(input_json) }
     end
     assert errors.empty?, 'Resource failed to validate.'
+    # check memory
+    before = check_memory
+    resource = nil
+    wait_for_gc
+    after = check_memory
+    assert_memory(before, after)
   end
 end
