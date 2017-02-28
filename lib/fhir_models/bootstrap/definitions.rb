@@ -63,7 +63,7 @@ module FHIR
     private_class_method :resources
 
     def self.resource_definitions
-      resources
+      resources.select { |r| r['kind'] == 'resource' }
     end
     deprecate :get_resource_definitions, :resource_definitions
 
