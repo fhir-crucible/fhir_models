@@ -15,6 +15,8 @@ def check_memory
   memory
 end
 
+GCDELAY = ENV['GCDELAY'] || 0.1
+
 def wait_for_gc
   # The Ruby garbage collector is asynchronous and has no callback features,
   # so you don't know when it is finished. We'll call it twice with a short sleep
@@ -22,6 +24,6 @@ def wait_for_gc
   count = GC.count
   while(GC.count <= count+1) do
     ObjectSpace.garbage_collect
-    sleep 0.1
+    sleep GCDELAY
   end
 end
