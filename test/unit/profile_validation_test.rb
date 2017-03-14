@@ -31,6 +31,17 @@ class ProfileValidationTest < Test::Unit::TestCase
       File.open("#{ERROR_DIR}/#{example_name}.json", 'w:UTF-8') { |file| file.write(input_json) }
     end
     assert errors.empty?, 'Resource failed to validate.'
+    # check memory
+    before = check_memory
+    resource = nil
+    profile = nil
+    wait_for_gc
+    after = check_memory
+    unless after.empty?
+      puts "BEFORE GC: #{before}"
+      puts "AFTER GC: #{after}"
+    end
+    assert after.empty?, 'Garbage collection missed FHIR Models.'
   end
 
   def test_language_binding_validation
@@ -39,5 +50,15 @@ class ProfileValidationTest < Test::Unit::TestCase
     model = FHIR::Resource.new('language' => 'en-US')
     assert model.valid?, 'Language validation failed.'
     FHIR::Resource::METADATA['language']['binding']['strength'] = binding_strength
+    # check memory
+    before = check_memory
+    model = nil
+    wait_for_gc
+    after = check_memory
+    unless after.empty?
+      puts "BEFORE GC: #{before}"
+      puts "AFTER GC: #{after}"
+    end
+    assert after.empty?, 'Garbage collection missed FHIR Models.'
   end
 end

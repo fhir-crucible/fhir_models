@@ -62,5 +62,15 @@ class XmlSchemaValidationTest < Test::Unit::TestCase
     end
 
     assert errors_output.empty? || original_errors, "Schema Validation errors: \n #{errors_output.join('\n')}"
+    # check memory
+    before = check_memory
+    resource = nil
+    wait_for_gc
+    after = check_memory
+    unless after.empty?
+      puts "BEFORE GC: #{before}"
+      puts "AFTER GC: #{after}"
+    end
+    assert after.empty?, 'Garbage collection missed FHIR Models.'
   end
 end

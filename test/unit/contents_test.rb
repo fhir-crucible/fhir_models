@@ -9,6 +9,16 @@ class ContentsTest < Test::Unit::TestCase
     patient = FHIR.from_contents(xml)
     assert !patient.nil?, 'From contents did not succeed with XML.'
     assert patient.id == 'example', 'Patient did not deserialize correctly.'
+    # check memory
+    before = check_memory
+    patient = nil
+    wait_for_gc
+    after = check_memory
+    unless after.empty?
+      puts "BEFORE GC: #{before}"
+      puts "AFTER GC: #{after}"
+    end
+    assert after.empty?, 'Garbage collection missed FHIR Models.'
   end
 
   def test_json_from_contents
@@ -16,6 +26,16 @@ class ContentsTest < Test::Unit::TestCase
     patient = FHIR.from_contents(json)
     assert !patient.nil?, 'From contents did not succeed with JSON.'
     assert patient.id == 'example', 'Patient did not deserialize correctly.'
+    # check memory
+    before = check_memory
+    patient = nil
+    wait_for_gc
+    after = check_memory
+    unless after.empty?
+      puts "BEFORE GC: #{before}"
+      puts "AFTER GC: #{after}"
+    end
+    assert after.empty?, 'Garbage collection missed FHIR Models.'
   end
 
   def test_to_reference
@@ -24,6 +44,17 @@ class ContentsTest < Test::Unit::TestCase
     reference = patient.to_reference
     assert reference.is_a?(FHIR::Reference), 'Resource unable to create a self-reference.'
     assert reference.reference == 'Patient/example', 'Resource did not generate self-reference correctly.'
+    # check memory
+    before = check_memory
+    patient = nil
+    reference = nil
+    wait_for_gc
+    after = check_memory
+    unless after.empty?
+      puts "BEFORE GC: #{before}"
+      puts "AFTER GC: #{after}"
+    end
+    assert after.empty?, 'Garbage collection missed FHIR Models.'
   end
 
   def test_negative_json_contents

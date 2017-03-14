@@ -28,12 +28,30 @@ class XmlValidationTest < Test::Unit::TestCase
       File.open("#{ERROR_DIR}/#{example_name}.xml", 'w:UTF-8') { |file| file.write(input_xml) }
     end
     assert errors.empty?, 'Resource failed to validate.'
+    # check memory
+    before = check_memory
+    resource = nil
+    wait_for_gc
+    after = check_memory
+    unless after.empty?
+      puts "BEFORE GC: #{before}"
+      puts "AFTER GC: #{after}"
+    end
+    assert after.empty?, 'Garbage collection missed FHIR Models.'
   end
 
   def test_xml_is_valid
     filename = File.join(EXAMPLE_ROOT, 'patient-example.xml')
     xml = File.read(filename)
     assert FHIR::Xml.valid?(xml), 'XML failed to schema validate.'
+    # check memory
+    wait_for_gc
+    after = check_memory
+    unless after.empty?
+      puts "BEFORE GC: #{before}"
+      puts "AFTER GC: #{after}"
+    end
+    assert after.empty?, 'Garbage collection missed FHIR Models.'
   end
 
   def test_resource_is_valid
@@ -41,5 +59,15 @@ class XmlValidationTest < Test::Unit::TestCase
     xml = File.read(filename)
     resource = FHIR::Xml.from_xml(xml)
     assert resource.valid?, 'Resource failed to validate.'
+    # check memory
+    before = check_memory
+    resource = nil
+    wait_for_gc
+    after = check_memory
+    unless after.empty?
+      puts "BEFORE GC: #{before}"
+      puts "AFTER GC: #{after}"
+    end
+    assert after.empty?, 'Garbage collection missed FHIR Models.'
   end
 end

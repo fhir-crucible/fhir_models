@@ -42,6 +42,16 @@ class JsonFormatTest < Test::Unit::TestCase
     end
 
     assert errors.empty?, 'Differences in generated JSON vs original'
+    # check memory
+    before = check_memory
+    resource = nil
+    wait_for_gc
+    after = check_memory
+    unless after.empty?
+      puts "BEFORE GC: #{before}"
+      puts "AFTER GC: #{after}"
+    end
+    assert after.empty?, 'Garbage collection missed FHIR Models.'
   end
 
   def run_json_xml_json_lossiness_test(example_file, example_name)
@@ -64,6 +74,17 @@ class JsonFormatTest < Test::Unit::TestCase
     end
 
     assert errors.empty?, 'Differences in generated JSON vs original'
+    # check memory
+    before = check_memory
+    resource_from_json = nil
+    resource_from_xml = nil
+    wait_for_gc
+    after = check_memory
+    unless after.empty?
+      puts "BEFORE GC: #{before}"
+      puts "AFTER GC: #{after}"
+    end
+    assert after.empty?, 'Garbage collection missed FHIR Models.'
   end
 
   def compare(hash_input, hash_output)
