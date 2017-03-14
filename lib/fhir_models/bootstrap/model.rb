@@ -15,7 +15,7 @@ module FHIR
       end
     end
 
-    def method_missing(method, *args, &block)
+    def method_missing(method, *_args, &_block)
       if defined?(self.class::MULTIPLE_TYPES) && self.class::MULTIPLE_TYPES[method.to_s]
         self.class::MULTIPLE_TYPES[method.to_s].each do |type|
           type[0] = type[0].upcase
