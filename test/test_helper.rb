@@ -15,7 +15,7 @@ def check_memory
   memory
 end
 
-GCDELAY = ENV['GCDELAY'] || 0.1
+GCDELAY = ENV['GCDELAY'].to_f || 0.1
 puts "***** GCDELAY: #{GCDELAY} *****"
 
 def wait_for_gc
