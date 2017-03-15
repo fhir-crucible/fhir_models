@@ -33,11 +33,7 @@ class XmlValidationTest < Test::Unit::TestCase
     resource = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def test_xml_is_valid
@@ -47,11 +43,7 @@ class XmlValidationTest < Test::Unit::TestCase
     # check memory
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def test_resource_is_valid
@@ -64,10 +56,6 @@ class XmlValidationTest < Test::Unit::TestCase
     resource = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 end

@@ -49,12 +49,7 @@ class EqualityTest < Test::Unit::TestCase
     instance_b = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-      binding.pry
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def run_json_mismatch_test(example_file, example_name)
@@ -71,12 +66,7 @@ class EqualityTest < Test::Unit::TestCase
     instance_b = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-      binding.pry
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def run_xml_equality_test(example_file, example_name)
@@ -94,12 +84,7 @@ class EqualityTest < Test::Unit::TestCase
     instance_b = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-      binding.pry
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def run_equality_test(example_json_file, example_xml_file, example_name)
@@ -122,12 +107,7 @@ class EqualityTest < Test::Unit::TestCase
     instance_b = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-      binding.pry
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def test_mismatch
@@ -141,11 +121,6 @@ class EqualityTest < Test::Unit::TestCase
     y = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-      binding.pry
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 end

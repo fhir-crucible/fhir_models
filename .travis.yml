@@ -1,6 +1,6 @@
 language: ruby
 env:
-  - GCDELAY=1.0
+  - GCDELAY=2.0
 rvm:
   - "2.1.10"
   - "2.2.6"

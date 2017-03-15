@@ -10,11 +10,7 @@ class ExtensionByNameTest < Test::Unit::TestCase
     patient = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def test_modifier_extension_by_name
@@ -26,11 +22,7 @@ class ExtensionByNameTest < Test::Unit::TestCase
     patient = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def test_extension_by_anchor
@@ -42,11 +34,7 @@ class ExtensionByNameTest < Test::Unit::TestCase
     patient = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def test_modifier_extension_by_anchor
@@ -58,11 +46,7 @@ class ExtensionByNameTest < Test::Unit::TestCase
     patient = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def test_nested_extension_by_name
@@ -75,11 +59,7 @@ class ExtensionByNameTest < Test::Unit::TestCase
     patient = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def test_nested_modifier_extension_by_name
@@ -92,10 +72,6 @@ class ExtensionByNameTest < Test::Unit::TestCase
     patient = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 end

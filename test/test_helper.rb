@@ -16,6 +16,7 @@ def check_memory
 end
 
 GCDELAY = ENV['GCDELAY'] || 0.1
+puts "***** GCDELAY: #{GCDELAY} *****"
 
 def wait_for_gc
   # The Ruby garbage collector is asynchronous and has no callback features,
@@ -26,4 +27,12 @@ def wait_for_gc
     ObjectSpace.garbage_collect
     sleep GCDELAY
   end
+end
+
+def assert_memory(before,after)
+  unless after.empty?
+    puts "BEFORE GC: #{before}"
+    puts "AFTER GC: #{after}"
+  end
+  assert after.empty?, 'Garbage collection missed FHIR Models.'
 end

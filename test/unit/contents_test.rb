@@ -14,11 +14,7 @@ class ContentsTest < Test::Unit::TestCase
     patient = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def test_json_from_contents
@@ -31,11 +27,7 @@ class ContentsTest < Test::Unit::TestCase
     patient = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def test_to_reference
@@ -50,11 +42,7 @@ class ContentsTest < Test::Unit::TestCase
     reference = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def test_negative_json_contents

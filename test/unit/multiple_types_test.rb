@@ -58,11 +58,7 @@ class MultipleTypesTest < Test::Unit::TestCase
     obs = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def test_non_existing_multiple_types
@@ -73,11 +69,7 @@ class MultipleTypesTest < Test::Unit::TestCase
     obs = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def test_multiple_cardinality
@@ -93,10 +85,6 @@ class MultipleTypesTest < Test::Unit::TestCase
     obs = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 end

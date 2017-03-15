@@ -49,11 +49,7 @@ class XmlFormatTest < Test::Unit::TestCase
     resource = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def run_xml_json_xml_lossiness_test(example_file, example_name)
@@ -83,11 +79,7 @@ class XmlFormatTest < Test::Unit::TestCase
     resource_from_json = nil
     wait_for_gc
     after = check_memory
-    unless after.empty?
-      puts "BEFORE GC: #{before}"
-      puts "AFTER GC: #{after}"
-    end
-    assert after.empty?, 'Garbage collection missed FHIR Models.'
+    assert_memory(before, after)
   end
 
   def calculate_errors(input_nodes, output_nodes)
