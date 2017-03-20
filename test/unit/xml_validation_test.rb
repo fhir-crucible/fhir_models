@@ -43,7 +43,7 @@ class XmlValidationTest < Test::Unit::TestCase
     # check memory
     wait_for_gc
     after = check_memory
-    assert_memory(before, after)
+    assert_memory({}, after)
   end
 
   def test_resource_is_valid
