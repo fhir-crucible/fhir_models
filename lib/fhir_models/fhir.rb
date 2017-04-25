@@ -24,7 +24,7 @@ module FHIR
   end
 
   # TODO: pull regexes from metadata
-  def self.primitive?(datatype:, value:)
+  def self.primitive?(datatype: '', value: nil)
     # Remaining data types: handle special cases before checking type StructureDefinitions
     case datatype.downcase
     when 'boolean'
