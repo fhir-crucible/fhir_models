@@ -57,20 +57,50 @@ $ bundle exec rake fhir:console
 
   ### Validation
 
-  Using built in validation...
+  Resources can be validated against the definition of a base resource or profile.  All validation methods return a number
+  `ValidationResult` instances which represent a validation check performed on an element in the resource.  Results are 
+  returned for both passing and failing checks.
+
+  Validation against the base resource definition...
   ```ruby
   patient.valid? # returns true or false
-  patient.validate # returns Hash of errors, empty if valid
+  patient.validate # returns an Array of ValidationResults
   ```
 
-  Using a profile or structure definition...
+  Validating with a profile or StructureDefinition...
   ```ruby
   sd = FHIR::Definitions.resource_definition('Patient')
   sd.validates_resource?(patient) # passing in FHIR::Patient
-  # Validation failed? Get the errors and warnings...
-  puts sd.errors
-  puts sd.warnings
+  sd.validate_resource(patient) # returns an Array of ValidationResults
   ```
+
+  Validation results can be filtered...
+  ```ruby
+  # Get cardinality results
+  results.select {|res| res.validation_type == :cardinality}
+
+  # Get all failing results
+  results.select {|res| res.result == :fail}
+  ```
+
+  A customized validator can also be created.
+
+  ```ruby
+  sd = FHIR::Definitions.resource_definition('Patient')
+  structure_validator = FHIR::Validation::StructureValidator.new(sd)
+
+  # Remove the default element validators
+  structure_validator.clear_element_validators
+
+  # Register the cardinality validator
+  structure_validator.register_element_validators(FHIR::Validation::CardinalityValidator)
+
+  # Add the default element validators
+  structure_validator.add_default_element_validators
+  ```
+
+  A custom element validator that implements the `#validate` method can also be supplied in this way.
+
 # License
 
 Copyright 2014-2019 The MITRE Corporation

@@ -8,13 +8,16 @@ Dir['lib/fhir_models/tasks/**/*.rake'].each do |file|
   load file
 end
 
-desc 'Run basic tests'
-Rake::TestTask.new(:test) do |t|
+desc 'Run minitest tests'
+Rake::TestTask.new(:minitest) do |t|
   t.libs << 'test'
   t.test_files = FileList['test/**/*_test.rb']
   t.verbose = true
   t.warning = false
 end
+
+desc 'Run all tests'
+task test: %i[minitest spec]
 
 RSpec::Core::RakeTask.new
 
@@ -23,4 +26,4 @@ task :rubocop do
   RuboCop::RakeTask.new
 end
 
-task default: %i[rubocop spec test]
+task default: %i[rubocop test]

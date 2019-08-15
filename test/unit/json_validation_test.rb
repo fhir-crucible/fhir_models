@@ -22,10 +22,13 @@ class JsonValidationTest < Test::Unit::TestCase
   def run_json_validation_test(example_file, example_name)
     input_json = File.read(example_file)
     resource = FHIR::Json.from_json(input_json)
-    errors = resource.validate
+    errors = resource.validate.select {|res| res.result == :fail}
     unless errors.empty?
-      File.open("#{ERROR_DIR}/#{example_name}.err", 'w:UTF-8') { |file| file.write(JSON.pretty_unparse(errors)) }
-      File.open("#{ERROR_DIR}/#{example_name}.json", 'w:UTF-8') { |file| file.write(input_json) }
+      File.open("#{ERROR_DIR}/#{example_name}.err", 'w:UTF-8') do |file|
+        errors.each do |error|
+          file.write("Validation Type: #{error.validation_type}. Element Path: #{error.element_path}. Message: #{error.text} \n")
+        end
+      end
     end
     assert errors.empty?, "Resource failed to validate: #{errors}"
     # check memory

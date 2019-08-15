@@ -23,10 +23,14 @@ class XmlValidationTest < Test::Unit::TestCase
     omit 'fhir_models does not support primitive extensions' if PRIMITIVE_EXTENSIONS.include?(example_name)
     input_xml = File.read(example_file)
     resource = FHIR::Xml.from_xml(input_xml)
-    errors = resource.validate
+    errors = resource.validate.select {|res| res.result == :fail}
+
     unless errors.empty?
-      File.open("#{ERROR_DIR}/#{example_name}.err", 'w:UTF-8') { |file| file.write(JSON.pretty_unparse(errors)) }
-      File.open("#{ERROR_DIR}/#{example_name}.xml", 'w:UTF-8') { |file| file.write(input_xml) }
+      File.open("#{ERROR_DIR}/#{example_name}.err", 'w:UTF-8') do |file|
+        errors.each do |error|
+          file.write("Validation Type: #{error.validation_type}. Element Path: #{error.element_path}. Message: #{error.text} \n")
+        end
+      end
     end
     assert errors.empty?, 'Resource failed to validate.'
     # check memory

@@ -8,3 +8,9 @@ tmp/
 
 # User-specific
 .idea
+
+## Documentation cache and generated files:
+/.yardoc/
+/_yardoc/
+/doc/
+/rdoc/

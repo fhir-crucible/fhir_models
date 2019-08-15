@@ -13,6 +13,14 @@ module FHIR
 
     @@cache = {}
 
+    # Return the type or resource definition associated with the type name
+    #
+    # @param type_name [String] The name of the type
+    # @return result [FHIR::StructureDefinition] The StructureDefinition of the type or resource
+    def self.definition(type_name)
+      type_definition(type_name) || resource_definition(type_name)
+    end
+
     # ----------------------------------------------------------------
     #  Types
     # ----------------------------------------------------------------

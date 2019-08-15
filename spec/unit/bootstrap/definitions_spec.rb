@@ -1,7 +1,7 @@
 describe FHIR::Definitions do
   context '.load_extensions'
 
-  context '.get_display' do
+  context 'get_display' do
     let(:code) { '306005' }
     let(:uri) { 'http://snomed.info/sct' }
 
@@ -29,6 +29,21 @@ describe FHIR::Definitions do
         code = '14647-2'
         expect(FHIR::Definitions.get_display(uri, code)).to eq 'Cholesterol [Moles/Volume]'
       end
+    end
+  end
+
+  describe '#definition' do
+    it 'returns resource definitions' do
+      type_def = FHIR::Definitions.definition('Patient')
+      expect(type_def).to be_a(FHIR::StructureDefinition)
+    end
+    it 'returns primitive-type definitions' do
+      type_def = FHIR::Definitions.definition('code')
+      expect(type_def).to be_a(FHIR::StructureDefinition)
+    end
+    it 'returns complex-type definitions' do
+      type_def = FHIR::Definitions.definition('Address')
+      expect(type_def).to be_a(FHIR::StructureDefinition)
     end
   end
 end

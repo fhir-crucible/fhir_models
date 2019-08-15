@@ -3,7 +3,7 @@ RSpec.describe 'FHIR::Model' do
     it 'should be the same for two identical fhir models' do
       attributes = {
         name: [
-          family: [ 'Smith' ]
+          family: ['Smith']
         ]
       }
       patient1 = FHIR::Patient.new(attributes)
@@ -14,12 +14,12 @@ RSpec.describe 'FHIR::Model' do
     it 'should be different for two models that do not have the same attributes' do
       attributes1 = {
         name: [
-          family: [ 'Smith' ]
+          family: ['Smith']
         ]
       }
       attributes2 = {
         name: [
-          family: [ 'Jones' ]
+          family: ['Jones']
         ]
       }
       patient1 = FHIR::Patient.new(attributes1)
@@ -32,7 +32,7 @@ RSpec.describe 'FHIR::Model' do
     it 'should be true for two identical fhir models' do
       attributes = {
         name: [
-          family: [ 'Smith' ]
+          family: ['Smith']
         ]
       }
       patient1 = FHIR::Patient.new(attributes)
@@ -44,12 +44,12 @@ RSpec.describe 'FHIR::Model' do
     it 'should be false for two models that do not have the same attributes' do
       attributes1 = {
         name: [
-          family: [ 'Smith' ]
+          family: ['Smith']
         ]
       }
       attributes2 = {
         name: [
-          family: [ 'Jones' ]
+          family: ['Jones']
         ]
       }
       patient1 = FHIR::Patient.new(attributes1)
@@ -61,11 +61,11 @@ RSpec.describe 'FHIR::Model' do
     it 'should be false when compared to a different class' do
       attributes1 = {
         name: [
-          family: [ 'Smith' ]
+          family: ['Smith']
         ]
       }
       patient1 = FHIR::Patient.new(attributes1)
-      patient2 = "patient 2"
+      patient2 = 'patient 2'
       expect(patient1).not_to eq patient2
       expect(patient1).not_to eql patient2
     end
@@ -73,13 +73,12 @@ RSpec.describe 'FHIR::Model' do
     it 'should be false when compared to nil' do
       attributes1 = {
         name: [
-          family: [ 'Smith' ]
+          family: ['Smith']
         ]
       }
       patient1 = FHIR::Patient.new(attributes1)
       expect(patient1).not_to eq nil
       expect(patient1).not_to be_nil
     end
-
   end
 end

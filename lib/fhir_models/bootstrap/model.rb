@@ -17,6 +17,18 @@ module FHIR
       end
     end
 
+    # Retrieve the elements in the resource which are defined by the provided ElementDefinition
+    #
+    # @param element_definition [FHIR::ElementDefinition] The ElementDefinition which defines the desired resources
+    # @param indexed [Boolean] If the elements should be returned individually or as a collection
+    # @param normalized [Boolean] If the elements with a choice of type should be normalized
+    def retrieve_elements_by_definition(element_definition, indexed: false, normalized: false)
+      FHIR::Validation::Retrieval.retrieve_by_element_definition(self,
+                                                                 element_definition,
+                                                                 indexed: indexed,
+                                                                 normalized: normalized)
+    end
+
     # This is necessary for uniq to properly identify two FHIR models as being identical
     def hash
       to_hash.hash
@@ -59,7 +71,7 @@ module FHIR
     end
 
     def to_reference
-      FHIR::Reference.new(reference: "#{self.class.name.split('::').last}/#{id}")
+      FHIR::Reference.new(reference: "#{type_name}/#{id}")
     end
 
     def equals?(other, exclude = [])
@@ -101,174 +113,35 @@ module FHIR
       end
     end
 
+    # Checks if the resource conforms to the base resource StructureDefinition
+    # @return [Boolean] if the resource is valid
     def valid?
-      validate.empty?
+      validate.select { |res| res.result == :fail }.empty?
     end
     deprecate :is_valid?, :valid?
 
-    def validate(contained = nil)
-      validate_profile(self.class::METADATA, contained)
+    # Validates the resource against the base resource StructureDefinition
+    #
+    # @return [Array<FHIR::Validation::ValidationResult>] The validation results
+    def validate
+      type_def = type_definition
+      FHIR::Validation::StructureValidator.new(type_def).validate(self)
     end
 
-    def validate_profile(metadata, contained = nil)
-      contained_here = [instance_variable_get('@contained'.to_sym)].flatten
-      contained_here << contained
-      contained_here = contained_here.flatten.compact
-      errors = {}
-      metadata.each do |field, meta|
-        if meta.is_a?(Array)
-          # this field has been 'sliced'
-          meta.each do |slice|
-            local_name = slice['local_name'] || field
-            value = [instance_variable_get("@#{local_name}".to_sym)].flatten.compact
-            subset = [] # subset is the values associated with just this slice
-            if slice['type'] == 'Extension'
-              subset = if slice['type_profiles']
-                         value.select { |x| slice['type_profiles'].include?(x.url) }
-                       else
-                         value
-                       end
-            else
-              FHIR.logger.warn 'Validation not supported on slices (except for Extensions)'
-            end
-            validate_field(field, subset, contained_here, slice, errors)
-          end
-        else
-          local_name = meta['local_name'] || field
-          value = [instance_variable_get("@#{local_name}".to_sym)].flatten.compact
-          validate_field(field, value, contained_here, meta, errors)
-        end
-      end # metadata.each
-      # check multiple types
-      multiple_types = begin
-                         self.class::MULTIPLE_TYPES
-                       rescue
-                         {}
-                       end
-      multiple_types.each do |prefix, suffixes|
-        present = []
-        suffixes.each do |suffix|
-          typename = "#{prefix}#{suffix[0].upcase}#{suffix[1..-1]}"
-          # check which multiple data types are actually present, not just errors
-          # actually, this might be allowed depending on cardinality
-          value = instance_variable_get("@#{typename}")
-          present << typename if !value.nil? || (value.is_a?(Array) && !value.empty?)
-        end
-        errors[prefix] = ["#{prefix}[x]: more than one type present."] if present.length > 1
-        # remove errors for suffixes that are not present
-        next unless present.length == 1
-        suffixes.each do |suffix|
-          typename = "#{prefix}#{suffix[0].upcase}#{suffix[1..-1]}"
-          errors.delete(typename) unless present.include?(typename)
-        end
-      end
-      errors.keep_if { |_k, v| (v && !v.empty?) }
+    # Get the demodulized name of the class
+    #
+    # e.g. FHIR::Patient would return: 'Patient'
+    # @return [String] The name of the FHIR Resource
+    def type_name
+      self.class.name.split('::').last
     end
 
-    # ----- validate a field -----
-    # field: the field name
-    # value: an array of values for this field
-    # contained_here: all contained resources to be considered
-    # meta: the metadata definition for this field (or slice)
-    # errors: the ongoing list of errors
-    def validate_field(field, value, contained_here, meta, errors)
-      errors[field] = []
-      # check cardinality
-      count = value.length
-      unless count >= meta['min'] && count <= meta['max']
-        errors[field] << "#{meta['path']}: invalid cardinality. Found #{count} expected #{meta['min']}..#{meta['max']}"
-      end
-      # check datatype
-      datatype = meta['type']
-      value.each do |v|
-        klassname = v.class.name.gsub('FHIR::', '')
-        # if the data type is a generic Resource, validate it
-        if datatype == 'Resource'
-          if FHIR::RESOURCES.include?(klassname)
-            validation = v.validate(contained_here)
-            errors[field] << validation unless validation.empty?
-          else
-            errors[field] << "#{meta['path']}: expected Resource, found #{klassname}"
-          end
-        # if the data type is a Reference, validate it, but also check the
-        # type_profiles metadata. For example, if it should be a Reference(Patient)
-        elsif datatype == 'Reference'
-          if klassname == 'Reference'
-            validation = v.validate(contained_here)
-            errors[field] << validation unless validation.empty?
-            validate_reference_type(v, meta, contained_here, errors[field])
-          else
-            errors[field] << "#{meta['path']}: expected Reference, found #{klassname}"
-          end
-        # if the data type is a particular resource or complex type or BackBone element within this resource
-        elsif FHIR::RESOURCES.include?(datatype) || FHIR::TYPES.include?(datatype) || v.class.name.start_with?(self.class.name)
-          if datatype == klassname
-            validation = v.validate(contained_here)
-            errors[field] << validation unless validation.empty?
-          else
-            errors[field] << "#{meta['path']}: incorrect type. Found #{klassname} expected #{datatype}"
-          end
-        # if the data type is a primitive, test the regular expression (if any)
-        elsif FHIR::PRIMITIVES.include?(datatype)
-          primitive_meta = FHIR::PRIMITIVES[datatype]
-          if primitive_meta['regex'] && primitive_meta['type'] != 'number'
-            match = (v.to_s =~ Regexp.new(primitive_meta['regex']))
-            errors[field] << "#{meta['path']}: #{v} does not match #{datatype} regex" if match.nil?
-          else
-            errors[field] << "#{meta['path']}: #{v} is not a valid #{datatype}" unless FHIR.primitive?(datatype: datatype, value: v)
-          end
-        end
-        # check binding
-        next unless meta['binding']
-        next unless meta['binding']['strength'] == 'required'
-        the_codes = [v]
-        if meta['type'] == 'Coding'
-          the_codes = [v.code]
-        elsif meta['type'] == 'CodeableConcept'
-          the_codes = v.coding.map(&:code).compact
-        end
-        has_valid_code = false
-        if meta['valid_codes']
-          meta['valid_codes'].each do |_key, codes|
-            has_valid_code = true unless (codes & the_codes).empty?
-            break if has_valid_code
-          end
-        else
-          the_codes.each do |code|
-            has_valid_code = true if check_binding_uri(meta['binding']['uri'], code)
-            break if has_valid_code
-          end
-        end
-        errors[field] << "#{meta['path']}: invalid codes #{the_codes}" unless has_valid_code
-      end # value.each
-      errors.delete(field) if errors[field].empty?
-    end
-
-    def validate_reference_type(ref, meta, contained_here, errors)
-      return unless ref.reference && meta['type_profiles']
-      return if ref.reference.start_with?('urn:uuid:', 'urn:oid:')
-      matches_one_profile = false
-      meta['type_profiles'].each do |p|
-        basetype = p.split('/').last
-        matches_one_profile = true if ref.reference.include?(basetype)
-        # check profiled resources
-        profile_basetype = FHIR::Definitions.basetype(p)
-        matches_one_profile = true if profile_basetype && ref.reference.include?(profile_basetype)
-      end
-      matches_one_profile = true if meta['type_profiles'].include?('http://hl7.org/fhir/StructureDefinition/Resource')
-      if !matches_one_profile && ref.reference.start_with?('#')
-        # we need to look at the local contained resources
-        r = contained_here.find { |x| x.id == ref.reference[1..-1] }
-        if !r.nil?
-          meta['type_profiles'].each do |p|
-            p = p.split('/').last
-            matches_one_profile = true if r.resourceType == p
-          end
-        else
-          FHIR.logger.warn "Unable to resolve reference #{ref.reference}"
-        end
-      end
-      errors << "#{meta['path']}: incorrect Reference type, expected #{meta['type_profiles'].map { |x| x.split('/').last }.join('|')}" unless matches_one_profile
+    # Get the StructureDefinition of this type
+    #
+    # e.g. FHIR::Patient would return the FHIR::StructureDefinition of the Patient resource
+    # @return [FHIR::StructureDefinition] The StructureDefinition that defines the base resource
+    def type_definition
+      FHIR::Definitions.definition(type_name)
     end
 
     def primitive?(datatype, value)
@@ -276,29 +149,5 @@ module FHIR
       FHIR.primitive?(datatype: datatype, value: value)
     end
     deprecate :is_primitive?, :primitive?
-
-    def check_binding_uri(uri, value)
-      valid = false
-      uri = uri[0..-7] if uri.end_with?('|4.0.0')
-      valueset = FHIR::Definitions.get_codes(uri)
-
-      if uri == 'http://hl7.org/fhir/ValueSet/mimetypes' || uri == 'http://www.rfc-editor.org/bcp/bcp13.txt'
-        matches = MIME::Types[value]
-        json_or_xml = value.downcase.include?('xml') || value.downcase.include?('json')
-        known_weird = ['text/cql', 'application/cql+text', 'application/hl7-v2'].include?(value)
-        valid = json_or_xml || known_weird || (!matches.nil? && !matches.empty?)
-      elsif uri == 'http://hl7.org/fhir/ValueSet/languages' || uri == 'http://tools.ietf.org/html/bcp47'
-        has_region = !(value =~ /-/).nil?
-        valid = !BCP47::Language.identify(value.downcase).nil? && (!has_region || !BCP47::Region.identify(value.upcase).nil?)
-      elsif valueset.nil?
-        FHIR.logger.warn "Unable to check_binding_uri on unknown ValueSet: #{uri}"
-      else
-        valid = valueset.values.flatten.include?(value)
-      end
-
-      valid
-    end
-
-    private :validate_reference_type, :check_binding_uri, :validate_field
   end
 end

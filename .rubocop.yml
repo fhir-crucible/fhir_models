@@ -1,9 +1,9 @@
+require: rubocop-rspec
 inherit_from: .rubocop_todo.yml
 AllCops:
   TargetRubyVersion: 2.4
   Exclude:
     - 'test/**/*'
-    - 'spec/**/*'
     - 'lib/fhir_models/fhir/**/*'
     - 'lib/fhir_models/fluentpath/evaluate.rb'
     - 'lib/**/*.rake'
@@ -17,3 +17,10 @@ Style/FrozenStringLiteralComment:
 inherit_mode:
   merge:
     - Exclude
+Naming/RescuedExceptionsVariableName:
+  PreferredName: 'e'
+RSpec/FilePath:
+  Enabled: false
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*.rb'

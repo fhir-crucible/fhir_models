@@ -33,3 +33,8 @@ end
 Dir.glob(File.join(root, 'lib', 'fhir_models', 'fhir_ext', '*.rb')).each do |file|
   require file
 end
+
+# Require validation code
+Dir.glob(File.join(root, 'lib', 'fhir_models', 'validation', '**', '*.rb')).each do |file|
+  require file
+end
