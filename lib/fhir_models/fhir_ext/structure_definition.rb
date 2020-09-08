@@ -161,7 +161,6 @@ module FHIR
       if !element.type.empty? && element.path != id
         # element.type not being empty implies data_type_found != nil, for valid profiles
         codeable_concept_pattern = element.pattern && element.pattern.is_a?(FHIR::CodeableConcept)
-        codeable_concept_binding = element.binding
         matching_pattern = false
         nodes.each do |value|
           matching_type = 0
