@@ -8,6 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = FHIR::Models::VERSION
   spec.authors       = ['Jason Walonoski', 'Andre Quina', "Michael O'Keefe", 'Robert Scanlon', 'Reece Adamson']
   spec.email         = ['jwalonoski@mitre.org']
+  spec.license       = 'apache-2.0'
 
   spec.summary       = %q{A Gem for handling FHIR models in ruby}
   spec.description   = %q{A Gem for handling FHIR models in ruby}
