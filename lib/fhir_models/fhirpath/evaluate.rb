@@ -181,7 +181,7 @@ module FHIRPath
               if exts.is_a?(Array)
                 url = nil
                 begin
-                  url = block.tree.first.gsub(/\'|\"/, '')
+                  url = block.tree.third.gsub(/\'|\"/, '')
                 rescue
                   raise 'Extension function requires a single URL as String.'
                 end
