@@ -1,0 +1,19 @@
+{
+  "name": "Inferno Capability Statement",
+  "status": "draft",
+  "date": "2019-07",
+  "kind": "capability",
+  "fhirVersion": "4.0.0",
+  "format": "json",
+  "rest": [
+    {
+      "mode": "server",
+      "resource": "TestScript"
+    },
+    {
+      "mode": "server",
+      "resource": "TestReport"
+    }
+  ],
+  "resourceType": "CapabilityStatement"
+}
