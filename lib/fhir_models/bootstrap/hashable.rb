@@ -27,18 +27,21 @@ module FHIR
       blank = ->(obj) { obj.respond_to?(:empty?) ? obj.empty? : obj.nil? }
       if thing.is_a?(Array)
         return nil if thing.empty?
-        thing.map! { |i| prune(i) }
-        thing.reject!(&blank)
+
+        thing
+          .map { |i| prune(i) }
+          .reject(&blank)
       elsif thing.is_a?(Hash)
         return {} if thing.empty?
+
+        new_thing = {}
         thing.each do |key, value|
-          thing[key] = prune(value)
+          new_thing[key] = prune(value) unless blank.call(value)
         end
-        thing.delete_if do |_key, value|
-          blank.call(value)
-        end
+        new_thing
+      else
+        thing
       end
-      thing
     end
 
     def from_hash(hash)
