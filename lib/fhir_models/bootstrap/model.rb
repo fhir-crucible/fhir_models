@@ -6,7 +6,11 @@ require 'bcp47'
 module FHIR
   class Model
     extend FHIR::Deprecate
+
+    attr_reader :source_text, :source_hash
+
     def initialize(hash = {})
+      @source_hash = hash
       from_hash(hash)
       self.class::METADATA.each do |key, value|
         local_name = key
@@ -60,6 +64,10 @@ module FHIR
 
     def to_reference
       FHIR::Reference.new(reference: "#{self.class.name.split('::').last}/#{id}")
+    end
+
+    def source_contents
+      source_text || JSON.generate(source_hash)
     end
 
     def equals?(other, exclude = [])
