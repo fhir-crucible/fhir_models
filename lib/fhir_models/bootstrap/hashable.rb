@@ -44,9 +44,9 @@ module FHIR
       end
     end
 
-    def from_hash(hash)
+    def from_hash(original_hash)
       # eliminate empty stuff
-      hash = prune(hash) unless hash.empty?
+      pruned_hash = prune(original_hash) unless original_hash.empty?
       # clear the existing variables
       self.class::METADATA.each do |key, value|
         local_name = key
@@ -54,7 +54,8 @@ module FHIR
         instance_variable_set("@#{local_name}", nil)
       end
       # set the variables to the hash values
-      hash.each do |key, value|
+      pruned_hash&.each_key do |key|
+        value = original_hash[key]
         key = key.to_s
         meta = self.class::METADATA[key]
         next if meta.nil?
