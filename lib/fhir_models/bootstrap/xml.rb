@@ -1,6 +1,6 @@
 require 'nokogiri'
 module FHIR
-  module Xml
+  module Xml # rubocop:disable Metrics/ModuleLength
     extend FHIR::Deprecate
     #
     #  This module includes methods to serialize or deserialize FHIR resources to and from XML.
@@ -83,6 +83,8 @@ module FHIR
         FHIR.logger.debug("XML:\n#{xml}")
         resource = nil
       end
+
+      resource&.instance_variable_set(:@source_text, xml)
       resource
     end
 

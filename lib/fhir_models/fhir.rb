@@ -23,7 +23,6 @@ module FHIR
         FHIR::Json.from_json(contents)
       end
 
-    resource&.instance_variable_set(:@source_text, contents)
     resource
   end
 
