@@ -16,14 +16,11 @@ module FHIR
 
   def self.from_contents(contents)
     doc = Nokogiri::XML(contents)
-    resource =
-      if doc.errors.empty?
-        FHIR::Xml.from_xml(contents)
-      else
-        FHIR::Json.from_json(contents)
-      end
-
-    resource
+    if doc.errors.empty?
+      FHIR::Xml.from_xml(contents)
+    else
+      FHIR::Json.from_json(contents)
+    end
   end
 
   # TODO: pull regexes from metadata

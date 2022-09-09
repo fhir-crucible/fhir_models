@@ -23,21 +23,4 @@ class HashableTest < Test::Unit::TestCase
 
     assert JSON.generate(original_hash) == original_hash_string
   end
-
-  def test_from_hash_keeps_empty_fields_in_source
-    original_hash = {
-      'resourceType' => 'Bundle',
-      'entry' => [
-        {
-          'resource' => { 'resourceType' => 'Patient', 'gender' => '' }
-        }
-      ]
-    }
-
-    bundle = FHIR::Bundle.new(original_hash)
-    patient = bundle.entry.first.resource
-
-    assert patient.gender.nil?
-    assert patient.source_hash['gender'] == ''
-  end
 end

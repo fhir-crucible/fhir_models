@@ -22,8 +22,6 @@ module FHIR
         FHIR.logger.debug("JSON:\n#{json}")
         resource = nil
       end
-
-      resource&.instance_variable_set(:@source_text, json)
       resource
     end
   end
