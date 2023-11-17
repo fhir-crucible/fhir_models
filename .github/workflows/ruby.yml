@@ -15,13 +15,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set frozen config to false
-      run: bundle config set --local frozen false
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby-version }}
-        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+    - name: Set frozen config to false
+      run: bundle config set --local frozen false
+    - name: Install Dependencies
+      bundler-cache: true # runs 'bundle install' and caches installed gems automatically
     - name: Run tests
       run: bundle exec rake
     - name: Rubocop
