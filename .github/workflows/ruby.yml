@@ -22,7 +22,9 @@ jobs:
     - name: Set frozen config to false
       run: bundle config set --local frozen false
     - name: Install Dependencies
-      bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+      run: bundle install
+      with:
+        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
     - name: Run tests
       run: bundle exec rake
     - name: Rubocop
