@@ -22,6 +22,10 @@ module FHIR
       to_hash.hash
     end
 
+    def respond_to_missing?(method_name, *)
+      defined?(self.class::MULTIPLE_TYPES) && self.class::MULTIPLE_TYPES[method_name.to_s] || super
+    end
+
     # allow two FHIR models to be compared for equality
     def ==(other)
       self.class == other.class && to_hash == other.to_hash

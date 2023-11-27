@@ -96,4 +96,18 @@ RSpec.describe 'FHIR::Model' do
       expect(range.low.value).to equal(18)
     end
   end
+
+  describe '#respond_to?' do
+    it 'yields true for :value on choice elements' do
+      extension = FHIR::Extension.new(valueInteger: 5)
+      expect(extension.value).to eq(5)
+      expect(extension.respond_to? :value).to be_truthy
+    end
+
+    it 'yields false for :value on nonchoice elements' do
+      range = FHIR::Range.new(low: FHIR::Quantity.new(value: 18))
+      expect(range.respond_to? :value).to eq(false)
+    end
+  end
+
 end
