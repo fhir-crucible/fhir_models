@@ -24,7 +24,7 @@ module FHIR
       # if hash contains resourceType
       # create a child node with the name==resourceType
       # fill that, and place the child under the above `node`
-      if hash['resourceType'] && hash['resourceType'].is_a?(String) && name != 'instance'
+      if hash['resourceType'].is_a?(String) && name != 'instance'
         child_name = hash['resourceType']
         hash.delete('resourceType')
         child = hash_to_xml_node(child_name, hash, doc)
@@ -33,11 +33,13 @@ module FHIR
       end
 
       hash.each do |key, value|
-        next if %w[extension modifierExtension].include?(name) && key == 'url'
+        next if ['extension', 'modifierExtension'].include?(name) && key == 'url'
         next if key == 'id' && !FHIR::RESOURCES.include?(name)
-        if value.is_a?(Hash)
+
+        case value
+        when Hash
           node.add_child(hash_to_xml_node(key, value, doc))
-        elsif value.is_a?(Array)
+        when Array
           value.each do |v|
             if v.is_a?(Hash)
               node.add_child(hash_to_xml_node(key, v, doc))
@@ -62,7 +64,7 @@ module FHIR
           node.add_child(child)
         end
       end
-      node.set_attribute('url', hash['url']) if %w[extension modifierExtension].include?(name)
+      node.set_attribute('url', hash['url']) if ['extension', 'modifierExtension'].include?(name)
       node.set_attribute('id', hash['id']) if hash['id'] && !FHIR::RESOURCES.include?(name)
       node
     end
@@ -78,7 +80,7 @@ module FHIR
         resource_type = doc.root.name
         klass = Module.const_get("FHIR::#{resource_type}")
         resource = klass.new(hash)
-      rescue => e
+      rescue StandardError => e
         FHIR.logger.error("Failed to deserialize XML:\n#{e.backtrace}")
         FHIR.logger.debug("XML:\n#{xml}")
         resource = nil
@@ -108,7 +110,7 @@ module FHIR
           end
         end
       end
-      hash['url'] = node.get_attribute('url') if %w[extension modifierExtension].include?(node.name)
+      hash['url'] = node.get_attribute('url') if ['extension', 'modifierExtension'].include?(node.name)
       hash['id'] = node.get_attribute('id') if node.get_attribute('id') # Testscript fixture ids (applies to any BackboneElement)
       hash['resourceType'] = node.name if FHIR::RESOURCES.include?(node.name)
 

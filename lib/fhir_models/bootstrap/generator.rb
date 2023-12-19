@@ -1,7 +1,7 @@
 module FHIR
   module Boot
     class Generator
-      KNOWN_MISSING_EXPANSIONS = %w[bcp47 bcp13.txt mimetypes LL379-9].freeze
+      KNOWN_MISSING_EXPANSIONS = ['bcp47', 'bcp13.txt', 'mimetypes', 'LL379-9'].freeze
 
       attr_accessor :lib
       attr_accessor :defn
@@ -119,6 +119,7 @@ module FHIR
           # skip the first element
           next if element['path'] == path_type
           next unless element['type']
+
           unique_types = element['type'].map { |t| t['code'] }.uniq
           if unique_types.include?('Element') || unique_types.include?('BackboneElement')
             child_templates << element['path']
@@ -128,6 +129,7 @@ module FHIR
         child_templates.each do |child_name|
           child_fixed_name = cap_first(child_name.gsub("#{type_name}.", ''))
           next if child_fixed_name.include?('.')
+
           child_def = { 'id' => child_fixed_name, 'snapshot' => { 'element' => [] } }
           # Copy the element definitions for the child structure
           structure_def['snapshot']['element'].each do |element|
@@ -189,13 +191,13 @@ module FHIR
               field.path = element['path'].gsub(path_type, type_name)
               field.type = data_type
               field.type = 'Extension' if field.path.end_with?('extension')
-              field.type_profiles = profiles if data_type == 'Reference' || data_type == 'Extension'
+              field.type_profiles = profiles if ['Reference', 'Extension'].include?(data_type)
               field.min = element['min']
               field.max = element['max']
               field.max = field.max.to_i
               field.max = '*' if element['max'] == '*'
 
-              if %w[code Coding CodeableConcept].include?(data_type) && element['binding']
+              if ['code', 'Coding', 'CodeableConcept'].include?(data_type) && element['binding']
                 field.binding = element['binding']
                 field.binding['uri'] = field.binding['valueSet']
                 field.binding.delete('valueSet')
@@ -204,15 +206,15 @@ module FHIR
                 # set the actual code list
                 binding_uri = field.binding['uri']
                 # Strip off the |4.0.0 or |4.0.1 or |2014-03-26 or similar from the ends of URLs
-                binding_uri&.gsub!(/\|[A-Za-z0-9\.\-]*/, '')
+                binding_uri&.gsub!(/\|[A-Za-z0-9.\-]*/, '')
                 codes = @defn.get_codes(binding_uri)
                 field.valid_codes = codes unless codes.nil?
                 if field.valid_codes.empty? && binding_uri && !binding_uri.end_with?(*KNOWN_MISSING_EXPANSIONS)
                   FHIR.logger.warn "  MISSING EXPANSION -- #{field.path} #{field.min}..#{field.max}: #{binding_uri} (#{field.binding['strength']})"
                   @missing_expansions = true
-                  @missing_required_expansion = (field.binding['strength'] == 'required') unless @missing_required_expansion
+                  @missing_required_expansion ||= (field.binding['strength'] == 'required')
                 end
-              elsif %w[Element BackboneElement].include?(data_type)
+              elsif ['Element', 'BackboneElement'].include?(data_type)
                 # This is a nested structure or class
                 field.type = "#{hierarchy.join('::')}::#{cap_first(field.name)}"
               end
@@ -223,7 +225,7 @@ module FHIR
             field = FHIR::Field.new(field_base_name)
             field.path = element['path'].gsub(path_type, type_name)
             field.type = element['contentReference']
-            field.type = field.type[1..-1] if field.type[0] == '#'
+            field.type = field.type[1..] if field.type[0] == '#'
             if hierarchy.last == field.type
               # reference to self
               field.type = hierarchy.join('::').to_s

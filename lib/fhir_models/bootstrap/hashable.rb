@@ -25,13 +25,14 @@ module FHIR
       # Inspired by active-support `blank` but in our case false isn't blank ...
       # https://github.com/rails/rails/blob/v5.2.3/activesupport/lib/active_support/core_ext/object/blank.rb
       blank = ->(obj) { obj.respond_to?(:empty?) ? obj.empty? : obj.nil? }
-      if thing.is_a?(Array)
+      case thing
+      when Array
         return nil if thing.empty?
 
         thing
           .map { |i| prune(i) }
           .reject(&blank)
-      elsif thing.is_a?(Hash)
+      when Hash
         return {} if thing.empty?
 
         new_thing = {}
@@ -59,11 +60,12 @@ module FHIR
         key = key.to_s
         meta = self.class::METADATA[key]
         next if meta.nil?
+
         local_name = key
         local_name = meta['local_name'] if meta['local_name']
         begin
           instance_variable_set("@#{local_name}", value)
-        rescue
+        rescue StandardError
           # TODO: this appears to be a dead code branch
           nil
         end
@@ -102,7 +104,7 @@ module FHIR
       if child['resourceType'] && !klass::METADATA['resourceType']
         klass = begin
           FHIR.const_get(child['resourceType'])
-        rescue => _exception
+        rescue StandardError => _e
           # TODO: this appears to be a dead code branch
           # TODO: should this log / re-raise the exception if encountered instead of silently swallowing it?
           FHIR.logger.error("Unable to identify embedded class #{child['resourceType']}\n#{exception.backtrace}")
@@ -111,9 +113,9 @@ module FHIR
       end
       begin
         obj = klass.new(child)
-      rescue => exception
+      rescue StandardError => e
         # TODO: should this re-raise the exception if encountered instead of silently swallowing it?
-        FHIR.logger.error("Unable to inflate embedded class #{klass}\n#{exception.backtrace}")
+        FHIR.logger.error("Unable to inflate embedded class #{klass}\n#{e.backtrace}")
       end
       obj
     end
@@ -125,7 +127,7 @@ module FHIR
       if meta['type'] == 'boolean'
         rval = value.strip == 'true'
       elsif FHIR::PRIMITIVES.include?(meta['type'])
-        if %w[decimal integer positiveInt unsignedInt].include?(meta['type'])
+        if ['decimal', 'integer', 'positiveInt', 'unsignedInt'].include?(meta['type'])
           rval = BigDecimal(value.to_s)
           rval = rval.frac.zero? ? rval.to_i : rval.to_f
         end # primitive is number

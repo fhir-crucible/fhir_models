@@ -10,6 +10,7 @@ module FHIR
         end
       end
       return unless methods.include? new_method
+
       (class << self; self; end).instance_eval do
         define_method(old_method) do |*args, &block|
           message = "DEPRECATED: `#{old_method}` has been deprecated. Use `#{new_method}` instead. Called from #{caller.first}"

@@ -24,7 +24,7 @@ module FHIR
     def serialize
       hash = {}
       instance_variables.each do |v|
-        hash[v.to_s[1..-1]] = instance_variable_get(v)
+        hash[v.to_s[1..]] = instance_variable_get(v)
       end
       hash.delete('name')
       prune(hash)
@@ -32,7 +32,7 @@ module FHIR
 
     def fix_name(name)
       fix = nil
-      fix = "local_#{name}" if %w[class method resourceType].include?(name)
+      fix = "local_#{name}" if ['class', 'method', 'resourceType'].include?(name)
       fix
     end
   end

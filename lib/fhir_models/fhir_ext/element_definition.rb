@@ -25,6 +25,7 @@ module FHIR
     def keep_children(whitelist = [])
       @marked_for_keeping = true if whitelist.include?(path)
       return unless @children
+
       @children.each do |child|
         child.keep_children(whitelist)
       end
@@ -32,14 +33,16 @@ module FHIR
 
     def sweep_children
       return unless @children
+
       @children.each(&:sweep_children)
-      @children = @children.keep_if(&:marked_for_keeping)
+      @children.keep_if(&:marked_for_keeping)
       @marked_for_keeping = !@children.empty? || @marked_for_keeping
     end
 
     def print_children(spaces = 0)
       puts "#{' ' * spaces}+#{local_name || path}"
       return nil unless @children
+
       @children.each do |child|
         child.print_children(spaces + 2)
       end

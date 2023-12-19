@@ -145,14 +145,14 @@ module FHIR
       end # metadata.each
       # check multiple types
       multiple_types = begin
-                         self.class::MULTIPLE_TYPES
-                       rescue
-                         {}
-                       end
+        self.class::MULTIPLE_TYPES
+      rescue StandardError
+        {}
+      end
       multiple_types.each do |prefix, suffixes|
         present = []
         suffixes.each do |suffix|
-          typename = "#{prefix}#{suffix[0].upcase}#{suffix[1..-1]}"
+          typename = "#{prefix}#{suffix[0].upcase}#{suffix[1..]}"
           # check which multiple data types are actually present, not just errors
           # actually, this might be allowed depending on cardinality
           value = instance_variable_get("@#{typename}")
@@ -161,8 +161,9 @@ module FHIR
         errors[prefix] = ["#{prefix}[x]: more than one type present."] if present.length > 1
         # remove errors for suffixes that are not present
         next unless present.length == 1
+
         suffixes.each do |suffix|
-          typename = "#{prefix}#{suffix[0].upcase}#{suffix[1..-1]}"
+          typename = "#{prefix}#{suffix[0].upcase}#{suffix[1..]}"
           errors.delete(typename) unless present.include?(typename)
         end
       end
@@ -225,10 +226,12 @@ module FHIR
         # check binding
         next unless meta['binding']
         next unless meta['binding']['strength'] == 'required'
+
         the_codes = [v]
-        if meta['type'] == 'Coding'
+        case meta['type']
+        when 'Coding'
           the_codes = [v.code]
-        elsif meta['type'] == 'CodeableConcept'
+        when 'CodeableConcept'
           the_codes = v.coding.map(&:code).compact
         end
         has_valid_code = false
@@ -251,6 +254,7 @@ module FHIR
     def validate_reference_type(ref, meta, contained_here, errors)
       return unless ref.reference && meta['type_profiles']
       return if ref.reference.start_with?('urn:uuid:', 'urn:oid:')
+
       matches_one_profile = false
       meta['type_profiles'].each do |p|
         basetype = p.split('/').last
@@ -262,7 +266,7 @@ module FHIR
       matches_one_profile = true if meta['type_profiles'].include?('http://hl7.org/fhir/StructureDefinition/Resource')
       if !matches_one_profile && ref.reference.start_with?('#')
         # we need to look at the local contained resources
-        r = contained_here.find { |x| x.id == ref.reference[1..-1] }
+        r = contained_here.find { |x| x.id == ref.reference[1..] }
         if !r.nil?
           meta['type_profiles'].each do |p|
             p = p.split('/').last
@@ -284,15 +288,15 @@ module FHIR
     def check_binding_uri(uri, value)
       valid = false
       # Strip off the |4.0.0 or |4.0.1 or |2014-03-26 or similar from the ends of URLs
-      uri&.gsub!(/\|[A-Za-z0-9\.\-]*/, '')
+      uri&.gsub!(/\|[A-Za-z0-9.\-]*/, '')
       valueset = FHIR::Definitions.get_codes(uri)
 
-      if uri == 'http://hl7.org/fhir/ValueSet/mimetypes' || uri == 'http://www.rfc-editor.org/bcp/bcp13.txt'
+      if ['http://hl7.org/fhir/ValueSet/mimetypes', 'http://www.rfc-editor.org/bcp/bcp13.txt'].include?(uri)
         matches = MIME::Types[value]
         json_or_xml = value.downcase.include?('xml') || value.downcase.include?('json')
         known_weird = ['text/cql', 'application/cql+text', 'application/hl7-v2'].include?(value)
         valid = json_or_xml || known_weird || (!matches.nil? && !matches.empty?)
-      elsif uri == 'http://hl7.org/fhir/ValueSet/languages' || uri == 'http://tools.ietf.org/html/bcp47'
+      elsif ['http://hl7.org/fhir/ValueSet/languages', 'http://tools.ietf.org/html/bcp47'].include?(uri)
         has_region = !(value =~ /-/).nil?
         valid = !BCP47::Language.identify(value.downcase).nil? && (!has_region || !BCP47::Region.identify(value.upcase).nil?)
       elsif valueset.nil?

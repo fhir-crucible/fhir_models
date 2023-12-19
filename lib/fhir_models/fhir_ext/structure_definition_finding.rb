@@ -15,7 +15,7 @@ module FHIR
       "#{resourceType},#{profileIdA},#{profileIdB},#{path},#{attribute},#{status},#{message},#{valueA},#{valueB}"
     end
 
-    def to_json
+    def to_json(*_args)
       JSON.pretty_unparse(as_json)
     end
 
@@ -30,7 +30,7 @@ module FHIR
           hash.each do |key, value|
             obj.send("#{key}=".to_sym, value) if value
           end
-        rescue => e
+        rescue StandardError => e
           FHIR.logger.error "Failed to parse JSON: #{e.message}"
           return nil
         end

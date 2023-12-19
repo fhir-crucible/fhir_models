@@ -16,12 +16,10 @@ module FHIRPath
 
     def clone
       clone_tree = @tree.map do |x|
-        begin
-          x.clone
-        rescue
-          # TODO: This appears to be dead code
-          x
-        end
+        x.clone
+      rescue StandardError
+        # TODO: This appears to be dead code
+        x
       end
       FHIRPath::Expression.new(clone_tree)
     end

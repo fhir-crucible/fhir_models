@@ -1,6 +1,6 @@
 inherit_from: .rubocop_todo.yml
 AllCops:
-  TargetRubyVersion: 2.4
+  TargetRubyVersion: 3.0
   Exclude:
     - 'test/**/*'
     - 'spec/**/*'
@@ -12,6 +12,8 @@ AllCops:
     - 'bin/*'
 Layout/LineLength:
   Enabled: false
+Style/AccessorGrouping:
+  Enabled: false
 Style/FrozenStringLiteralComment:
   Enabled: false
 Style/HashEachMethods:
@@ -20,6 +22,8 @@ Style/HashTransformKeys:
   Enabled: true
 Style/HashTransformValues:
   Enabled: true
+Style/WordArray:
+  EnforcedStyle: brackets
 inherit_mode:
   merge:
     - Exclude

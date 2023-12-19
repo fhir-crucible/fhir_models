@@ -59,7 +59,7 @@ module FHIR
       if json.is_a? String
         begin
           json = JSON.parse(json)
-        rescue => e
+        rescue StandardError => e
           @errors << "Failed to parse JSON: #{e.message} %n #{h} %n #{e.backtrace.join("\n")}"
           return false
         end
@@ -99,13 +99,15 @@ module FHIR
     def get_json_nodes(json, path)
       results = []
       return [json] if path.nil?
+
       steps = path.split('.')
       steps.each.with_index do |step, index|
-        if json.is_a? Hash
+        case json
+        when Hash
           json = json[step]
-        elsif json.is_a? Array
+        when Array
           json.each do |e|
-            results << get_json_nodes(e, steps[index..-1].join('.'))
+            results << get_json_nodes(e, steps[index..].join('.'))
           end
           return results.flatten!
         else
@@ -125,7 +127,7 @@ module FHIR
 
     def verify_element(element, json)
       path = element.local_name || element.path
-      path = path[(@hierarchy.path.size + 1)..-1] if path.start_with? @hierarchy.path
+      path = path[(@hierarchy.path.size + 1)..] if path.start_with? @hierarchy.path
 
       if element.type && !element.type.empty?
         data_type_found = element.type.first.code
@@ -157,10 +159,11 @@ module FHIR
       verify_cardinality(element, nodes)
 
       return if nodes.empty?
+
       # Check the datatype for each node, only if the element has one declared, and it isn't the root element
       if !element.type.empty? && element.path != id
         # element.type not being empty implies data_type_found != nil, for valid profiles
-        codeable_concept_pattern = element.pattern && element.pattern.is_a?(FHIR::CodeableConcept)
+        codeable_concept_pattern = element.pattern&.is_a?(FHIR::CodeableConcept)
         matching_pattern = false
         nodes.each do |value|
           matching_type = 0
@@ -197,7 +200,7 @@ module FHIR
                   matching_pattern = true if vcoding.system == pcoding.system && vcoding.code == pcoding.code
                 end
               end
-            elsif %w[CodeableConcept Coding Quantity].include? data_type_found
+            elsif ['CodeableConcept', 'Coding', 'Quantity'].include? data_type_found
               required_strength = element&.binding&.strength == 'required'
               binding_issues = required_strength ? @errors : @warnings
 
@@ -275,20 +278,20 @@ module FHIR
       # elsewhere. There is no good way to determine "where" you should evaluate the expression.
       element.constraint.each do |constraint|
         next unless constraint.expression && !nodes.empty?
+
         nodes.each do |node|
-          begin
-            result = FHIRPath.evaluate(constraint.expression, node)
-            if !result && constraint.severity == 'error'
-              @errors << "#{describe_element(element)}: FHIRPath expression evaluates to false for #{name} (containing: #{node}) invariant rule #{constraint.key}: #{constraint.human}"
-            end
-          rescue
-            @warnings << "#{describe_element(element)}: unable to evaluate FHIRPath expression against JSON for #{name} (containing: #{node}) invariant rule #{constraint.key}: #{constraint.human}"
+          result = FHIRPath.evaluate(constraint.expression, node)
+          if !result && constraint.severity == 'error'
+            @errors << "#{describe_element(element)}: FHIRPath expression evaluates to false for #{name} (containing: #{node}) invariant rule #{constraint.key}: #{constraint.human}"
           end
+        rescue StandardError
+          @warnings << "#{describe_element(element)}: unable to evaluate FHIRPath expression against JSON for #{name} (containing: #{node}) invariant rule #{constraint.key}: #{constraint.human}"
         end
       end
 
       # check children if the element has any
       return unless element.children
+
       nodes.each do |node|
         element.children.each do |child|
           verify_element(child, node)
@@ -323,7 +326,7 @@ module FHIR
               @errors += definition.errors
               @warnings += definition.warnings
             end
-          rescue
+          rescue StandardError
             @errors << "Unable to verify #{data_type_code} as a FHIR Resource."
           end
           return ret_val
@@ -347,7 +350,7 @@ module FHIR
               @errors += definition.errors
               @warnings += definition.warnings
             end
-          rescue
+          rescue StandardError
             @errors << "Unable to verify #{resource_type} as a FHIR Resource."
           end
           ret_val
@@ -373,7 +376,7 @@ module FHIR
               @errors += definition.errors
               @warnings += definition.warnings
             end
-          rescue
+          rescue StandardError
             @errors << "Unable to verify #{data_type_code} as a FHIR type."
           end
           ret_val
@@ -395,14 +398,14 @@ module FHIR
 
       matching_type = 0
 
-      if vs_uri == 'http://hl7.org/fhir/ValueSet/mimetypes' || vs_uri == 'http://www.rfc-editor.org/bcp/bcp13.txt'
+      if ['http://hl7.org/fhir/ValueSet/mimetypes', 'http://www.rfc-editor.org/bcp/bcp13.txt'].include?(vs_uri)
         matches = MIME::Types[value]
         known_weird = ['text/cql', 'application/cql+text', 'application/hl7-v2'].include?(value)
         if (matches.nil? || matches.size.zero? || known_weird) && !some_type_of_xml_or_json?(value)
           @errors << "#{element.path} has invalid mime-type: '#{value}'"
           matching_type -= 1 if element.binding.strength == 'required'
         end
-      elsif vs_uri == 'http://hl7.org/fhir/ValueSet/languages' || vs_uri == 'http://tools.ietf.org/html/bcp47'
+      elsif ['http://hl7.org/fhir/ValueSet/languages', 'http://tools.ietf.org/html/bcp47'].include?(vs_uri)
         has_region = !(value =~ /-/).nil?
         valid = !BCP47::Language.identify(value.downcase).nil? && (!has_region || !BCP47::Region.identify(value.upcase).nil?)
         unless valid
@@ -435,9 +438,10 @@ module FHIR
 
     def some_type_of_xml_or_json?(code)
       m = code.downcase
-      return true if m == 'xml' || m == 'json'
+      return true if ['xml', 'json'].include?(m)
       return true if m.start_with?('application/', 'text/') && m.end_with?('json', 'xml')
       return true if m.start_with?('application/xml', 'text/xml', 'application/json', 'text/json')
+
       false
     end
     deprecate :is_some_type_of_xml_or_json, :some_type_of_xml_or_json?
