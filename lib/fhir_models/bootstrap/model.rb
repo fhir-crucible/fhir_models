@@ -24,8 +24,8 @@ module FHIR
 
     def respond_to_missing?(method_name, *)
       (defined?(self.class::MULTIPLE_TYPES) && self.class::MULTIPLE_TYPES[method_name.to_s]) ||
-        (!@extension.nil? && !@extension.empty? && !@extension.respond_to?(:to_ary)) ||
-        (!@modifierExtension.nil? && !@modifierExtension.empty? && !@modifierExtension.respond_to?(:to_ary)) ||
+        (!@extension.nil? && !@extension.empty? && !find_extension(@extension, method_name).first.nil?) ||
+        (!@modifierExtension.nil? && !@modifierExtension.empty? && !find_extension(@modifierExtension, method_name).first.nil?) ||
         super
     end
 
@@ -44,20 +44,12 @@ module FHIR
         end
         return nil
       elsif !@extension.nil? && !@extension.empty?
-        ext = @extension.select do |x|
-          name = x.url.tr('-', '_').split('/').last
-          anchor = name.split('#').last
-          (method.to_s == name || method.to_s == anchor)
-        end
+        ext = find_extension(@extension, method)
         unless ext.first.nil?
           return ext.first.value.nil? ? ext.first : ext.first.value
         end
       elsif !@modifierExtension.nil? && !@modifierExtension.empty?
-        ext = @modifierExtension.select do |x|
-          name = x.url.tr('-', '_').split('/').last
-          anchor = name.split('#').last
-          (method.to_s == name || method.to_s == anchor)
-        end
+        ext = find_extension(@modifierExtension, method)
         unless ext.first.nil?
           return ext.first.value.nil? ? ext.first : ext.first.value
         end
@@ -332,6 +324,14 @@ module FHIR
       self
     end
 
-    private :validate_reference_type, :check_binding_uri, :validate_field
+    def find_extension(ext_source, method)
+      ext_source.select do |x|
+        name = x.url.tr('-', '_').split('/').last
+        anchor = name.split('#').last
+        (method.to_s == name || method.to_s == anchor)
+      end
+    end
+
+    private :validate_reference_type, :check_binding_uri, :validate_field, :find_extension
   end
 end
