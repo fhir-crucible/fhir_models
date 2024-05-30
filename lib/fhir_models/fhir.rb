@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'logger'
+require 'uri'
 
 module FHIR
   def self.logger
