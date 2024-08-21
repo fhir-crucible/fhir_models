@@ -28,7 +28,7 @@ module FHIR
       puts "Generating tests for IG #{File.basename(ig_file_name)}"
       load_ig_package
       generate_metadata
-      generate_types
+      # generate_types
       generate_resources
     end
 
@@ -60,7 +60,7 @@ module FHIR
       FileUtils.mkdir_p(output_folder)
 
       resource_definitions = ig_resources.resource_definitions
-      ClassGenerator.new(resource_definitions, ig_resources, output_folder).generate
+      ClassGenerator.new([resource_definitions.first], ig_resources, output_folder).generate
     end
   end
 end
