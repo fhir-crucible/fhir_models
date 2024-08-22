@@ -5,6 +5,14 @@ module FHIR
       include FHIR::Json
       include FHIR::Xml
 
+      def module_version_name
+        'R4B'
+      end
+
+      def module_version
+        FHIR::R4B
+      end
+
       MULTIPLE_TYPES = {
         'subject' => ['CodeableConcept', 'Reference']
       }
@@ -58,6 +66,14 @@ module FHIR
         include FHIR::Hashable
         include FHIR::Json
         include FHIR::Xml
+
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
 
         MULTIPLE_TYPES = {
           'definition' => ['CodeableConcept', 'canonical', 'Expression', 'DataRequirement'],

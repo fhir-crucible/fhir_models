@@ -5,6 +5,14 @@ module FHIR
       include FHIR::Json
       include FHIR::Xml
 
+      def module_version_name
+        'R4'
+      end
+
+      def module_version
+        FHIR::R4
+      end
+
       SEARCH_PARAMS = ['identifier', 'name', 'owner', 'patient', 'period', 'status', 'subject', 'type']
       METADATA = {
         'id' => {'type'=>'id', 'path'=>'Account.id', 'min'=>0, 'max'=>1},
@@ -33,6 +41,14 @@ module FHIR
         include FHIR::Json
         include FHIR::Xml
 
+        def module_version_name
+          'R4'
+        end
+
+        def module_version
+          FHIR::R4
+        end
+
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'Coverage.id', 'min'=>0, 'max'=>1},
           'extension' => {'type'=>'Extension', 'path'=>'Coverage.extension', 'min'=>0, 'max'=>Float::INFINITY},
@@ -52,6 +68,14 @@ module FHIR
         include FHIR::Hashable
         include FHIR::Json
         include FHIR::Xml
+
+        def module_version_name
+          'R4'
+        end
+
+        def module_version
+          FHIR::R4
+        end
 
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'Guarantor.id', 'min'=>0, 'max'=>1},

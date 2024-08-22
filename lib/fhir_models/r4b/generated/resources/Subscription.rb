@@ -5,6 +5,14 @@ module FHIR
       include FHIR::Json
       include FHIR::Xml
 
+      def module_version_name
+        'R4B'
+      end
+
+      def module_version
+        FHIR::R4B
+      end
+
       SEARCH_PARAMS = ['contact', 'criteria', 'payload', 'status', 'type', 'url']
       METADATA = {
         'id' => {'type'=>'id', 'path'=>'Subscription.id', 'min'=>0, 'max'=>1},
@@ -28,6 +36,14 @@ module FHIR
         include FHIR::Hashable
         include FHIR::Json
         include FHIR::Xml
+
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
 
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'Channel.id', 'min'=>0, 'max'=>1},

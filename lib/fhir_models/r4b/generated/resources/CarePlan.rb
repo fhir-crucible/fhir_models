@@ -5,6 +5,14 @@ module FHIR
       include FHIR::Json
       include FHIR::Xml
 
+      def module_version_name
+        'R4B'
+      end
+
+      def module_version
+        FHIR::R4B
+      end
+
       SEARCH_PARAMS = ['activity-code', 'activity-date', 'activity-reference', 'based-on', 'care-team', 'category', 'condition', 'date', 'encounter', 'goal', 'identifier', 'instantiates-canonical', 'instantiates-uri', 'intent', 'part-of', 'patient', 'performer', 'replaces', 'status', 'subject']
       METADATA = {
         'id' => {'type'=>'id', 'path'=>'CarePlan.id', 'min'=>0, 'max'=>1},
@@ -45,6 +53,14 @@ module FHIR
         include FHIR::Json
         include FHIR::Xml
 
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
+
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'Activity.id', 'min'=>0, 'max'=>1},
           'extension' => {'type'=>'Extension', 'path'=>'Activity.extension', 'min'=>0, 'max'=>Float::INFINITY},
@@ -60,6 +76,14 @@ module FHIR
           include FHIR::Hashable
           include FHIR::Json
           include FHIR::Xml
+
+          def module_version_name
+            'R4B'
+          end
+
+          def module_version
+            FHIR::R4B
+          end
 
           MULTIPLE_TYPES = {
             'scheduled' => ['Timing', 'Period', 'string'],

@@ -45,7 +45,7 @@ module FHIR
       end
     end
 
-    def from_hash(original_hash, version = 'R4')
+    def from_hash(original_hash)
       # eliminate empty stuff
       pruned_hash = prune(original_hash) unless original_hash.empty?
       # clear the existing variables
@@ -70,26 +70,26 @@ module FHIR
           nil
         end
         # inflate the value if it isn't a primitive
-        klass = FHIR.const_get(version)::PRIMITIVES.key?(meta['type']) ? nil : FHIR.const_get(version).const_get(meta['type'])
+        klass = module_version::PRIMITIVES.key?(meta['type']) ? nil : module_version.const_get(meta['type'])
         if !klass.nil? && !value.nil?
           # handle array of objects
           if value.is_a?(Array)
-            value = value.map { |child| make_child(child, klass, version) }
+            value = value.map { |child| make_child(child, klass) }
           else # handle single object
-            value = make_child(value, klass, version)
+            value = make_child(value, klass)
             # if there is only one of these, but cardinality allows more, we need to wrap it in an array.
             value = [value] if value && (meta['max'] > 1)
           end
           instance_variable_set("@#{local_name}", value)
-        elsif !FHIR.const_get(version)::PRIMITIVES.include?(meta['type']) && meta['type'] != 'xhtml'
+        elsif !module_version::PRIMITIVES.include?(meta['type']) && meta['type'] != 'xhtml'
           FHIR.logger.error("Unhandled and unrecognized class/type: #{meta['type']}")
         elsif value.is_a?(Array)
           # array of primitives
-          value = value.map { |child| convert_primitive(child, meta, version) }
+          value = value.map { |child| convert_primitive(child, meta) }
           instance_variable_set("@#{local_name}", value)
         else
           # single primitive
-          value = convert_primitive(value, meta, version)
+          value = convert_primitive(value, meta)
           # if there is only one of these, but cardinality allows more, we need to wrap it in an array.
           value = [value] if value && (meta['max'] > 1)
           instance_variable_set("@#{local_name}", value)
@@ -98,12 +98,12 @@ module FHIR
       self
     end
 
-    def make_child(child, klass, version = 'R4')
+    def make_child(child, klass)
       return child if child.is_a?(FHIR::Model)
 
       if child['resourceType'] && !klass::METADATA['resourceType']
         klass = begin
-          FHIR.const_get(version).const_get(child['resourceType'])
+          module_version.const_get(child['resourceType'])
         rescue StandardError => _e
           # TODO: this appears to be a dead code branch
           # TODO: should this log / re-raise the exception if encountered instead of silently swallowing it?
@@ -120,13 +120,13 @@ module FHIR
       obj
     end
 
-    def convert_primitive(value, meta, version = 'R4')
+    def convert_primitive(value, meta)
       return value unless value.is_a?(String)
 
       rval = value
       if meta['type'] == 'boolean'
         rval = value.strip == 'true'
-      elsif FHIR.const_get(version)::PRIMITIVES.include?(meta['type'])
+      elsif module_version::PRIMITIVES.include?(meta['type'])
         if ['decimal', 'integer', 'positiveInt', 'unsignedInt'].include?(meta['type'])
           rval = BigDecimal(value.to_s)
           rval = rval.frac.zero? ? rval.to_i : rval.to_f

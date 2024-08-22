@@ -5,6 +5,14 @@ module FHIR
       include FHIR::Json
       include FHIR::Xml
 
+      def module_version_name
+        'R4B'
+      end
+
+      def module_version
+        FHIR::R4B
+      end
+
       SEARCH_PARAMS = ['code', 'content-mode', 'context', 'context-quantity', 'context-type', 'date', 'description', 'identifier', 'jurisdiction', 'language', 'name', 'publisher', 'status', 'supplements', 'system', 'title', 'url', 'version']
       METADATA = {
         'id' => {'type'=>'id', 'path'=>'CodeSystem.id', 'min'=>0, 'max'=>1},
@@ -48,6 +56,14 @@ module FHIR
         include FHIR::Json
         include FHIR::Xml
 
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
+
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'Filter.id', 'min'=>0, 'max'=>1},
           'extension' => {'type'=>'Extension', 'path'=>'Filter.extension', 'min'=>0, 'max'=>Float::INFINITY},
@@ -71,6 +87,14 @@ module FHIR
         include FHIR::Hashable
         include FHIR::Json
         include FHIR::Xml
+
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
 
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'Property.id', 'min'=>0, 'max'=>1},
@@ -96,6 +120,14 @@ module FHIR
         include FHIR::Json
         include FHIR::Xml
 
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
+
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'Concept.id', 'min'=>0, 'max'=>1},
           'extension' => {'type'=>'Extension', 'path'=>'Concept.extension', 'min'=>0, 'max'=>Float::INFINITY},
@@ -112,6 +144,14 @@ module FHIR
           include FHIR::Hashable
           include FHIR::Json
           include FHIR::Xml
+
+          def module_version_name
+            'R4B'
+          end
+
+          def module_version
+            FHIR::R4B
+          end
 
           METADATA = {
             'id' => {'type'=>'string', 'path'=>'Designation.id', 'min'=>0, 'max'=>1},
@@ -134,6 +174,14 @@ module FHIR
           include FHIR::Hashable
           include FHIR::Json
           include FHIR::Xml
+
+          def module_version_name
+            'R4B'
+          end
+
+          def module_version
+            FHIR::R4B
+          end
 
           MULTIPLE_TYPES = {
             'value' => ['code', 'Coding', 'string', 'integer', 'boolean', 'dateTime', 'decimal']

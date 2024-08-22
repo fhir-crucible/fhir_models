@@ -5,6 +5,14 @@ module FHIR
       include FHIR::Json
       include FHIR::Xml
 
+      def module_version_name
+        'R4B'
+      end
+
+      def module_version
+        FHIR::R4B
+      end
+
       SEARCH_PARAMS = ['date', 'derived-or-self', 'identifier', 'resource', 'status', 'title', 'trigger-description', 'url', 'version']
       METADATA = {
         'id' => {'type'=>'id', 'path'=>'SubscriptionTopic.id', 'min'=>0, 'max'=>1},
@@ -44,6 +52,14 @@ module FHIR
         include FHIR::Json
         include FHIR::Xml
 
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
+
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'ResourceTrigger.id', 'min'=>0, 'max'=>1},
           'extension' => {'type'=>'Extension', 'path'=>'ResourceTrigger.extension', 'min'=>0, 'max'=>Float::INFINITY},
@@ -59,6 +75,14 @@ module FHIR
           include FHIR::Hashable
           include FHIR::Json
           include FHIR::Xml
+
+          def module_version_name
+            'R4B'
+          end
+
+          def module_version
+            FHIR::R4B
+          end
 
           METADATA = {
             'id' => {'type'=>'string', 'path'=>'QueryCriteria.id', 'min'=>0, 'max'=>1},
@@ -96,6 +120,14 @@ module FHIR
         include FHIR::Json
         include FHIR::Xml
 
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
+
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'EventTrigger.id', 'min'=>0, 'max'=>1},
           'extension' => {'type'=>'Extension', 'path'=>'EventTrigger.extension', 'min'=>0, 'max'=>Float::INFINITY},
@@ -117,6 +149,14 @@ module FHIR
         include FHIR::Hashable
         include FHIR::Json
         include FHIR::Xml
+
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
 
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'CanFilterBy.id', 'min'=>0, 'max'=>1},
@@ -143,6 +183,14 @@ module FHIR
         include FHIR::Hashable
         include FHIR::Json
         include FHIR::Xml
+
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
 
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'NotificationShape.id', 'min'=>0, 'max'=>1},

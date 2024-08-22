@@ -5,6 +5,14 @@ module FHIR
       include FHIR::Json
       include FHIR::Xml
 
+      def module_version_name
+        'R4B'
+      end
+
+      def module_version
+        FHIR::R4B
+      end
+
       SEARCH_PARAMS = ['context', 'context-quantity', 'context-type', 'date', 'description', 'effective', 'identifier', 'jurisdiction', 'publisher', 'status', 'title', 'url', 'version']
       METADATA = {
         'id' => {'type'=>'id', 'path'=>'ChargeItemDefinition.id', 'min'=>0, 'max'=>1},
@@ -45,6 +53,14 @@ module FHIR
         include FHIR::Json
         include FHIR::Xml
 
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
+
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'Applicability.id', 'min'=>0, 'max'=>1},
           'extension' => {'type'=>'Extension', 'path'=>'Applicability.extension', 'min'=>0, 'max'=>Float::INFINITY},
@@ -67,6 +83,14 @@ module FHIR
         include FHIR::Json
         include FHIR::Xml
 
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
+
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'PropertyGroup.id', 'min'=>0, 'max'=>1},
           'extension' => {'type'=>'Extension', 'path'=>'PropertyGroup.extension', 'min'=>0, 'max'=>Float::INFINITY},
@@ -79,6 +103,14 @@ module FHIR
           include FHIR::Hashable
           include FHIR::Json
           include FHIR::Xml
+
+          def module_version_name
+            'R4B'
+          end
+
+          def module_version
+            FHIR::R4B
+          end
 
           METADATA = {
             'id' => {'type'=>'string', 'path'=>'PriceComponent.id', 'min'=>0, 'max'=>1},

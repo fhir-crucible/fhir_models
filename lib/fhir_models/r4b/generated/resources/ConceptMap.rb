@@ -5,6 +5,14 @@ module FHIR
       include FHIR::Json
       include FHIR::Xml
 
+      def module_version_name
+        'R4B'
+      end
+
+      def module_version
+        FHIR::R4B
+      end
+
       MULTIPLE_TYPES = {
         'source' => ['uri', 'canonical'],
         'target' => ['uri', 'canonical']
@@ -46,6 +54,14 @@ module FHIR
         include FHIR::Json
         include FHIR::Xml
 
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
+
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'Group.id', 'min'=>0, 'max'=>1},
           'extension' => {'type'=>'Extension', 'path'=>'Group.extension', 'min'=>0, 'max'=>Float::INFINITY},
@@ -63,6 +79,14 @@ module FHIR
           include FHIR::Json
           include FHIR::Xml
 
+          def module_version_name
+            'R4B'
+          end
+
+          def module_version
+            FHIR::R4B
+          end
+
           METADATA = {
             'id' => {'type'=>'string', 'path'=>'Element.id', 'min'=>0, 'max'=>1},
             'extension' => {'type'=>'Extension', 'path'=>'Element.extension', 'min'=>0, 'max'=>Float::INFINITY},
@@ -76,6 +100,14 @@ module FHIR
             include FHIR::Hashable
             include FHIR::Json
             include FHIR::Xml
+
+            def module_version_name
+              'R4B'
+            end
+
+            def module_version
+              FHIR::R4B
+            end
 
             METADATA = {
               'id' => {'type'=>'string', 'path'=>'Target.id', 'min'=>0, 'max'=>1},
@@ -93,6 +125,14 @@ module FHIR
               include FHIR::Hashable
               include FHIR::Json
               include FHIR::Xml
+
+              def module_version_name
+                'R4B'
+              end
+
+              def module_version
+                FHIR::R4B
+              end
 
               METADATA = {
                 'id' => {'type'=>'string', 'path'=>'DependsOn.id', 'min'=>0, 'max'=>1},
@@ -136,6 +176,14 @@ module FHIR
           include FHIR::Hashable
           include FHIR::Json
           include FHIR::Xml
+
+          def module_version_name
+            'R4B'
+          end
+
+          def module_version
+            FHIR::R4B
+          end
 
           METADATA = {
             'id' => {'type'=>'string', 'path'=>'Unmapped.id', 'min'=>0, 'max'=>1},

@@ -5,6 +5,14 @@ module FHIR
       include FHIR::Json
       include FHIR::Xml
 
+      def module_version_name
+        'R4B'
+      end
+
+      def module_version
+        FHIR::R4B
+      end
+
       SEARCH_PARAMS = ['contraindication', 'contraindication-reference', 'effect', 'effect-reference', 'identifier', 'indication', 'indication-reference', 'interaction', 'product', 'subject', 'type']
       METADATA = {
         'id' => {'type'=>'id', 'path'=>'ClinicalUseDefinition.id', 'min'=>0, 'max'=>1},
@@ -33,6 +41,14 @@ module FHIR
         include FHIR::Json
         include FHIR::Xml
 
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
+
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'Contraindication.id', 'min'=>0, 'max'=>1},
           'extension' => {'type'=>'Extension', 'path'=>'Contraindication.extension', 'min'=>0, 'max'=>Float::INFINITY},
@@ -48,6 +64,14 @@ module FHIR
           include FHIR::Hashable
           include FHIR::Json
           include FHIR::Xml
+
+          def module_version_name
+            'R4B'
+          end
+
+          def module_version
+            FHIR::R4B
+          end
 
           METADATA = {
             'id' => {'type'=>'string', 'path'=>'OtherTherapy.id', 'min'=>0, 'max'=>1},
@@ -78,6 +102,14 @@ module FHIR
         include FHIR::Hashable
         include FHIR::Json
         include FHIR::Xml
+
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
 
         MULTIPLE_TYPES = {
           'duration' => ['Range', 'string']
@@ -114,6 +146,14 @@ module FHIR
         include FHIR::Json
         include FHIR::Xml
 
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
+
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'Interaction.id', 'min'=>0, 'max'=>1},
           'extension' => {'type'=>'Extension', 'path'=>'Interaction.extension', 'min'=>0, 'max'=>Float::INFINITY},
@@ -129,6 +169,14 @@ module FHIR
           include FHIR::Hashable
           include FHIR::Json
           include FHIR::Xml
+
+          def module_version_name
+            'R4B'
+          end
+
+          def module_version
+            FHIR::R4B
+          end
 
           MULTIPLE_TYPES = {
             'item' => ['Reference', 'CodeableConcept']
@@ -163,6 +211,14 @@ module FHIR
         include FHIR::Json
         include FHIR::Xml
 
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
+
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'UndesirableEffect.id', 'min'=>0, 'max'=>1},
           'extension' => {'type'=>'Extension', 'path'=>'UndesirableEffect.extension', 'min'=>0, 'max'=>Float::INFINITY},
@@ -184,6 +240,14 @@ module FHIR
         include FHIR::Hashable
         include FHIR::Json
         include FHIR::Xml
+
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
 
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'Warning.id', 'min'=>0, 'max'=>1},

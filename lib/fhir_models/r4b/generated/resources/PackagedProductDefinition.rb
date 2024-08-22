@@ -5,6 +5,14 @@ module FHIR
       include FHIR::Json
       include FHIR::Xml
 
+      def module_version_name
+        'R4B'
+      end
+
+      def module_version
+        FHIR::R4B
+      end
+
       SEARCH_PARAMS = ['biological', 'contained-item', 'device', 'identifier', 'manufactured-item', 'medication', 'name', 'nutrition', 'package', 'package-for', 'status']
       METADATA = {
         'id' => {'type'=>'id', 'path'=>'PackagedProductDefinition.id', 'min'=>0, 'max'=>1},
@@ -36,6 +44,14 @@ module FHIR
         include FHIR::Json
         include FHIR::Xml
 
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
+
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'LegalStatusOfSupply.id', 'min'=>0, 'max'=>1},
           'extension' => {'type'=>'Extension', 'path'=>'LegalStatusOfSupply.extension', 'min'=>0, 'max'=>Float::INFINITY},
@@ -55,6 +71,14 @@ module FHIR
         include FHIR::Hashable
         include FHIR::Json
         include FHIR::Xml
+
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
 
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'Package.id', 'min'=>0, 'max'=>1},
@@ -76,6 +100,14 @@ module FHIR
           include FHIR::Hashable
           include FHIR::Json
           include FHIR::Xml
+
+          def module_version_name
+            'R4B'
+          end
+
+          def module_version
+            FHIR::R4B
+          end
 
           MULTIPLE_TYPES = {
             'period' => ['Duration', 'string']
@@ -103,6 +135,14 @@ module FHIR
           include FHIR::Hashable
           include FHIR::Json
           include FHIR::Xml
+
+          def module_version_name
+            'R4B'
+          end
+
+          def module_version
+            FHIR::R4B
+          end
 
           MULTIPLE_TYPES = {
             'value' => ['CodeableConcept', 'Quantity', 'date', 'boolean', 'Attachment']
@@ -134,6 +174,14 @@ module FHIR
           include FHIR::Hashable
           include FHIR::Json
           include FHIR::Xml
+
+          def module_version_name
+            'R4B'
+          end
+
+          def module_version
+            FHIR::R4B
+          end
 
           METADATA = {
             'id' => {'type'=>'string', 'path'=>'ContainedItem.id', 'min'=>0, 'max'=>1},

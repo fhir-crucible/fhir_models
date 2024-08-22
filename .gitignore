@@ -9,4 +9,4 @@ tmp/
 .idea
 
 # ig-extraction
-lib/fhir_models/igs/package/
+lib/fhir_models/igs/packages

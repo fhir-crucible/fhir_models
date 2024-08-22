@@ -15,12 +15,12 @@ module FHIR
     @default_logger ||= Logger.new(ENV['FHIR_LOGGER'] || $stdout)
   end
 
-  def self.from_contents(contents, version = 'R4')
+  def self.from_contents(contents)
     doc = Nokogiri::XML(contents)
     if doc.errors.empty?
-      FHIR::Xml.from_xml(contents, version)
+      FHIR::Xml.from_xml(contents)
     else
-      FHIR::Json.from_json(contents, version)
+      FHIR::Json.from_json(contents)
     end
   end
 
@@ -79,5 +79,14 @@ module FHIR
       FHIR.logger.warn "Unable to check #{value} for datatype #{datatype}"
       false
     end
+  end
+
+  # These are needed for the unit tests that call FHIR directly
+  def self.module_version_name
+    'R4'
+  end
+
+  def self.module_version
+    FHIR::R4
   end
 end

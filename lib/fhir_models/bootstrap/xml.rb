@@ -69,7 +69,7 @@ module FHIR
       node
     end
 
-    def self.from_xml(xml, version = 'R4')
+    def self.from_xml(xml)
       doc = Nokogiri::XML(xml)
       doc.root.add_namespace_definition('f', 'http://hl7.org/fhir')
       doc.root.add_namespace_definition('x', 'http://www.w3.org/1999/xhtml')
@@ -78,7 +78,7 @@ module FHIR
       resource = nil
       begin
         resource_type = doc.root.name
-        klass = Module.const_get("FHIR::#{version}::#{resource_type}")
+        klass = module_version.const_get(resource_type)
         resource = klass.new(hash)
       rescue StandardError => e
         FHIR.logger.error("Failed to deserialize XML:\n#{e.backtrace}")
@@ -88,7 +88,7 @@ module FHIR
       resource
     end
 
-    def self.xml_node_to_hash(node, version = 'R4')
+    def self.xml_node_to_hash(node)
       hash = {}
       node.children.each do |child|
         next if [Nokogiri::XML::Text, Nokogiri::XML::Comment].include?(child.class)
@@ -112,11 +112,11 @@ module FHIR
       end
       hash['url'] = node.get_attribute('url') if ['extension', 'modifierExtension'].include?(node.name)
       hash['id'] = node.get_attribute('id') if node.get_attribute('id') # Testscript fixture ids (applies to any BackboneElement)
-      hash['resourceType'] = node.name if FHIR.const_get(version)::RESOURCES.include?(node.name)
+      hash['resourceType'] = node.name if module_version::RESOURCES.include?(node.name)
 
       # If this hash contains nothing but an embedded resource, we should return that
       # embedded resource without the wrapper
-      if hash.keys.length == 1 && FHIR.const_get(version)::RESOURCES.include?(hash.keys.first) && hash.values.first.is_a?(Hash) && hash.values.first['resourceType'] == hash.keys.first
+      if hash.keys.length == 1 && module_version::RESOURCES.include?(hash.keys.first) && hash.values.first.is_a?(Hash) && hash.values.first['resourceType'] == hash.keys.first
         hash.values.first
       else
         hash
@@ -133,6 +133,14 @@ module FHIR
       schema = File.join(defns, 'fhir-all.xsd')
       xsd = Nokogiri::XML::Schema(File.new(schema))
       xsd.validate(Nokogiri::XML(xml))
+    end
+
+    def self.module_version_name
+      FHIR.module_version_name
+    end
+
+    def self.module_version
+      FHIR.module_version
     end
 
     private :hash_to_xml_node

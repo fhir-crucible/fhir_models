@@ -5,6 +5,14 @@ module FHIR
       include FHIR::Json
       include FHIR::Xml
 
+      def module_version_name
+        'R4B'
+      end
+
+      def module_version
+        FHIR::R4B
+      end
+
       SEARCH_PARAMS = ['actual', 'characteristic', 'code', 'exclude', 'identifier', 'managing-entity', 'member', 'type', 'value']
       METADATA = {
         'id' => {'type'=>'id', 'path'=>'Group.id', 'min'=>0, 'max'=>1},
@@ -31,6 +39,14 @@ module FHIR
         include FHIR::Hashable
         include FHIR::Json
         include FHIR::Xml
+
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
 
         MULTIPLE_TYPES = {
           'value' => ['CodeableConcept', 'boolean', 'Quantity', 'Range', 'Reference']
@@ -66,6 +82,14 @@ module FHIR
         include FHIR::Hashable
         include FHIR::Json
         include FHIR::Xml
+
+        def module_version_name
+          'R4B'
+        end
+
+        def module_version
+          FHIR::R4B
+        end
 
         METADATA = {
           'id' => {'type'=>'string', 'path'=>'Member.id', 'min'=>0, 'max'=>1},

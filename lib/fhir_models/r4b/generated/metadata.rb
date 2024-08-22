@@ -1,6 +1,14 @@
 module FHIR
   module R4B
 
+    def module_version_name
+      'R4B'
+    end
+
+    def module_version
+      FHIR::R4B
+    end
+
     PRIMITIVES = {
       'unsignedInt' => {'type'=>'string', 'regex'=>'[0]|([1-9][0-9]*)'},
       'xhtml' => {'type'=>'string'},
