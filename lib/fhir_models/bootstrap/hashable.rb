@@ -113,6 +113,7 @@ module FHIR
       end
       begin
         obj = klass.new(child)
+        puts "Just completed #{obj} with child #{child}"
       rescue StandardError => e
         # TODO: should this re-raise the exception if encountered instead of silently swallowing it?
         FHIR.logger.error("Unable to inflate embedded class #{klass}\n#{e.backtrace}")

@@ -1,15 +1,21 @@
 require_relative 'template'
 
+VERSION_TO_MODULE = {
+  '4.0.1' => FHIR::R4,
+  '4.3.0' => FHIR::R4B
+}.freeze
+
 module FHIR
   class Generator
     class ClassGenerator
       KNOWN_MISSING_EXPANSIONS = ['bcp47', 'bcp13.txt', 'mimetypes', 'LL379-9'].freeze
-      attr_accessor :structure_defs, :ig_resources, :output_folder
+      attr_accessor :structure_defs, :ig_resources, :ig_version, :output_folder
 
       def initialize(structure_defs, ig_resources, output_folder)
         self.structure_defs = structure_defs
         self.ig_resources = ig_resources
         self.output_folder = output_folder
+        self.ig_version = ig_resources.ig_metadata.version
         @templates = []
       end
 
@@ -152,6 +158,7 @@ module FHIR
               end
 
               template.fields << field
+              template.fields << generate_primitive_extension(field) if VERSION_TO_MODULE[ig_version]::PRIMITIVES.include?(field.type) #TODO: Replace with a method that makes an extension field.
             end
           else # If there is no data type, treat the type as a reference to an already declared internal class
             field = FHIR::Field.new(field_base_name)
@@ -182,6 +189,15 @@ module FHIR
 
         template.constants['MULTIPLE_TYPES'] = multiple_data_types unless multiple_data_types.empty?
         template
+      end
+
+      def generate_primitive_extension(base_field)
+        field = FHIR::Field.new("_#{base_field.name}")
+        field.type = 'Extension'
+        field.min = 0
+        field.max = '*'
+        field.path = base_field.path.gsub(base_field.name, field.name)
+        field
       end
     end
   end
