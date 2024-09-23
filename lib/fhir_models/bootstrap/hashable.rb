@@ -61,6 +61,7 @@ module FHIR
         meta = self.class::METADATA[key]
         next if meta.nil?
 
+        # puts "CURRENT KEY: #{key}\n\n"
         local_name = key
         local_name = meta['local_name'] if meta['local_name']
         begin
@@ -71,23 +72,27 @@ module FHIR
         end
         # inflate the value if it isn't a primitive
         klass = module_version::PRIMITIVES.key?(meta['type']) ? nil : module_version.const_get(meta['type'])
-        if !klass.nil? && !value.nil?
+        puts "KLASS IS #{klass}"
+        if !klass.nil? && !value.nil? #TODO: profile is being skipped because the klass is nil, need to catch arrays of primitives to make sure primitive extension lists are handled correctly https://build.fhir.org/json.html#primitive
+          puts "caught #{value}"
           # handle array of objects
           if value.is_a?(Array)
             value = value.map { |child| make_child(child, klass) }
           else # handle single object
             value = make_child(value, klass)
             # if there is only one of these, but cardinality allows more, we need to wrap it in an array.
-            value = [value] if value && (meta['max'] > 1)
+            value = [value] if value && (meta['max'] > 1) && klass #!= module_version::Extension 
           end
           instance_variable_set("@#{local_name}", value)
         elsif !module_version::PRIMITIVES.include?(meta['type']) && meta['type'] != 'xhtml'
           FHIR.logger.error("Unhandled and unrecognized class/type: #{meta['type']}")
         elsif value.is_a?(Array)
+          puts "caught prim_array #{value}"
           # array of primitives
           value = value.map { |child| convert_primitive(child, meta) }
           instance_variable_set("@#{local_name}", value)
         else
+          puts "caught prim #{value}"
           # single primitive
           value = convert_primitive(value, meta)
           # if there is only one of these, but cardinality allows more, we need to wrap it in an array.
@@ -95,7 +100,12 @@ module FHIR
           instance_variable_set("@#{local_name}", value)
         end # !klass && !nil?
       end # hash loop
+      wrap_multiple_primitive_extension(self)
       self
+    end
+
+    def wrap_multiple_primitive_extension(resource)
+      
     end
 
     def make_child(child, klass)
@@ -112,8 +122,14 @@ module FHIR
         end
       end
       begin
-        obj = klass.new(child)
-        puts "Just completed #{obj} with child #{child}"
+        puts "#{child}, module version is #{module_version}, Extension: #{klass == module_version::Extension}"
+        if klass == module_version::Extension && child['extension']
+          # puts "Found Extensions #{child['extension']}"
+          obj = child['extension'].map { |extension| klass.new(extension) }
+        else
+          obj = klass.new(child)
+        end
+        # puts "Just completed #{obj} with child #{child} and klass of #{klass}"
       rescue StandardError => e
         # TODO: should this re-raise the exception if encountered instead of silently swallowing it?
         FHIR.logger.error("Unable to inflate embedded class #{klass}\n#{e.backtrace}")

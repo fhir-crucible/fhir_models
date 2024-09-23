@@ -1,0 +1,49 @@
+module FHIR
+  module R4
+    class Quantity < FHIR::Model
+      include FHIR::Hashable
+      include FHIR::Json
+      include FHIR::Xml
+
+      def module_version_name
+        'R4'
+      end
+
+      def module_version
+        FHIR::R4
+      end
+
+      SEARCH_PARAMS = []
+      METADATA = {
+        'id' => {'type'=>'string', 'path'=>'Quantity.id', 'min'=>0, 'max'=>1},
+        '_id' => {'type'=>'Element', 'path'=>'Quantity._id', 'min'=>0, 'max'=>1},
+        'extension' => {'type'=>'Extension', 'path'=>'Quantity.extension', 'min'=>0, 'max'=>Float::INFINITY},
+        'value' => {'type'=>'decimal', 'path'=>'Quantity.value', 'min'=>0, 'max'=>1},
+        '_value' => {'type'=>'Element', 'path'=>'Quantity._value', 'min'=>0, 'max'=>1},
+        'comparator' => {'valid_codes'=>{'http://hl7.org/fhir/quantity-comparator'=>['<', '<=', '>=', '>']}, 'type'=>'code', 'path'=>'Quantity.comparator', 'min'=>0, 'max'=>1, 'binding'=>{'strength'=>'required', 'uri'=>'http://hl7.org/fhir/ValueSet/quantity-comparator'}},
+        '_comparator' => {'type'=>'Element', 'path'=>'Quantity._comparator', 'min'=>0, 'max'=>1},
+        'unit' => {'type'=>'string', 'path'=>'Quantity.unit', 'min'=>0, 'max'=>1},
+        '_unit' => {'type'=>'Element', 'path'=>'Quantity._unit', 'min'=>0, 'max'=>1},
+        'system' => {'type'=>'uri', 'path'=>'Quantity.system', 'min'=>0, 'max'=>1},
+        '_system' => {'type'=>'Element', 'path'=>'Quantity._system', 'min'=>0, 'max'=>1},
+        'code' => {'type'=>'code', 'path'=>'Quantity.code', 'min'=>0, 'max'=>1},
+        '_code' => {'type'=>'Element', 'path'=>'Quantity._code', 'min'=>0, 'max'=>1}
+      }
+
+      attr_accessor :id          # 0-1 string
+      attr_accessor :_id         # 0-1 Element
+      attr_accessor :extension   # 0-* [ Extension ]
+      attr_accessor :value       # 0-1 decimal
+      attr_accessor :_value      # 0-1 Element
+      attr_accessor :comparator  # 0-1 code
+      attr_accessor :_comparator # 0-1 Element
+      attr_accessor :unit        # 0-1 string
+      attr_accessor :_unit       # 0-1 Element
+      attr_accessor :system      # 0-1 uri
+      attr_accessor :_system     # 0-1 Element
+      attr_accessor :code        # 0-1 code
+      attr_accessor :_code       # 0-1 Element
+    end
+  end
+  Quantity = FHIR::R4::Quantity
+end

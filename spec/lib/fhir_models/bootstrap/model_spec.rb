@@ -1,3 +1,4 @@
+require 'pry'
 RSpec.describe 'FHIR::Model' do
   describe '#hash' do
     it 'should be the same for two identical fhir models' do

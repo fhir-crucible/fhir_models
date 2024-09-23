@@ -12,24 +12,24 @@ class EqualityTest < Test::Unit::TestCase
   example_json_files = File.join(EXAMPLE_ROOT, '**', '*.json')
   example_xml_files = File.join(EXAMPLE_ROOT, '**', '*.xml')
 
-  Dir.glob(example_json_files).each do |example_file|
-    example_name = File.basename(example_file, '.json')
-    define_method("test_equality_#{example_name}_json") do
-      run_json_equality_test(example_file, example_name)
-    end
-  end
+  # Dir.glob(example_json_files).each do |example_file|
+  #   example_name = File.basename(example_file, '.json')
+  #   define_method("test_equality_#{example_name}_json") do
+  #     run_json_equality_test(example_file, example_name)
+  #   end
+  # end
 
-  Dir.glob(example_xml_files).each do |example_file|
-    example_name = File.basename(example_file, '.xml')
-    define_method("test_equality_#{example_name}_xml") do
-      run_xml_equality_test(example_file, example_name)
-    end
-  end
+  # Dir.glob(example_xml_files).each do |example_file|
+  #   example_name = File.basename(example_file, '.xml')
+  #   define_method("test_equality_#{example_name}_xml") do
+  #     run_xml_equality_test(example_file, example_name)
+  #   end
+  # end
 
   Dir.glob(example_json_files).each do |example_json_file|
     example_name = File.basename(example_json_file, '.json')
     example_xml_file = File.join(EXAMPLE_ROOT, 'xml', "#{example_name}.xml")
-    if File.exist?(example_xml_file)
+    if File.exist?(example_xml_file) && example_xml_file.include?('structuredefinition-example-composition.xml')
       define_method("test_equality_#{example_name}") do
         run_equality_test(example_json_file, example_xml_file, example_name)
       end

@@ -158,7 +158,7 @@ module FHIR
               end
 
               template.fields << field
-              template.fields << generate_primitive_extension(field) if VERSION_TO_MODULE[ig_version]::PRIMITIVES.include?(field.type) #TODO: Replace with a method that makes an extension field.
+              template.fields << generate_primitive_extension(field) if VERSION_TO_MODULE[ig_version]::PRIMITIVES.include?(field.type) # TODO: Replace with a method that makes an extension field.
             end
           else # If there is no data type, treat the type as a reference to an already declared internal class
             field = FHIR::Field.new(field_base_name)
@@ -193,9 +193,9 @@ module FHIR
 
       def generate_primitive_extension(base_field)
         field = FHIR::Field.new("_#{base_field.name}")
-        field.type = 'Extension'
+        field.type = 'Element'
         field.min = 0
-        field.max = '*'
+        field.max = base_field.max
         field.path = base_field.path.gsub(base_field.name, field.name)
         field
       end

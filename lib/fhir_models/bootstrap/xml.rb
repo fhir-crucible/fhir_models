@@ -35,6 +35,7 @@ module FHIR
       hash.each do |key, value|
         next if ['extension', 'modifierExtension'].include?(name) && key == 'url'
         next if key == 'id' && !FHIR::RESOURCES.include?(name)
+        next if key.include?('_')
 
         case value
         when Hash
@@ -64,6 +65,14 @@ module FHIR
           node.add_child(child)
         end
       end
+
+      hash.select { |key, value| key.include?('_')}
+          .each do |key, value| 
+            new_key = key[1..]
+            primitive_field = node.children.find { |child| child.name == new_key }
+            value.each { |extension| primitive_field.add_child(hash_to_xml_node('extension', extension, doc)) }
+          end
+
       node.set_attribute('url', hash['url']) if ['extension', 'modifierExtension'].include?(name)
       node.set_attribute('id', hash['id']) if hash['id'] && !FHIR::RESOURCES.include?(name)
       node
@@ -78,6 +87,7 @@ module FHIR
       resource = nil
       begin
         resource_type = doc.root.name
+        # puts hash
         klass = module_version.const_get(resource_type)
         resource = klass.new(hash)
       rescue StandardError => e
@@ -90,21 +100,39 @@ module FHIR
 
     def self.xml_node_to_hash(node)
       hash = {}
+      # puts "Current Node is #{node.name} which has #{node.children&.length} children\n\n\n" if node.name == "birthDate"
       node.children.each do |child|
         next if [Nokogiri::XML::Text, Nokogiri::XML::Comment].include?(child.class)
-
+        # puts "Dealing with :: #{child.name}, child of #{node.name}. #{child.name} has #{child.children.length} children."
         key = child.name
         if node.name == 'text' && key == 'div'
           hash[key] = child.to_xml
         else
           value = child.get_attribute('value')
-          if value.nil? && !child.children.empty?
-            value = xml_node_to_hash(child)
+          if !child.children.empty?
+            if value.nil?
+              value = xml_node_to_hash(child)
+            else
+              #Primitive Extension
+              primitive_extension = child.children
+                                         .select { |ext_child| ext_child.name == 'extension' }
+                                         .each { |ext_child| puts "#{ext_child}"}
+                                         .map { |ext_child| xml_node_to_hash(ext_child)} ##TODO: Helper function for handling extensions 
+              if hash["_#{key}"] 
+                hash["_#{key}"] = [primitive_extension] unless hash["_#{key}"].is_a?(Array) || hash[key].is_a?(Array)
+                hash["_#{key}"] << primitive_extension
+              else
+                hash["_#{key}"] = primitive_extension
+              end
+            end
           end
+
 
           if hash[key]
             hash[key] = [hash[key]] unless hash[key].is_a?(Array)
             hash[key] << value
+          elsif key == 'extension' && !value.is_a?(Array)
+            hash[key] = [value]
           else
             hash[key] = value
           end

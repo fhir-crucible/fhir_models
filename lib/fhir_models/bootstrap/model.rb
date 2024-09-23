@@ -326,6 +326,7 @@ module FHIR
 
     def find_extension(extension_source, method_name)
       extension_source.select do |extension|
+        binding.pry if extension.nil?
         name = extension.url.tr('-', '_').split('/').last
         anchor = name.split('#').last
         (method_name.to_s == name || method_name.to_s == anchor)
