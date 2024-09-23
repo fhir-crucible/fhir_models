@@ -1,6 +1,7 @@
 inherit_from: .rubocop_todo.yml
 AllCops:
   TargetRubyVersion: 3.0
+  
   Exclude:
     - 'test/**/*'
     - 'spec/**/*'
@@ -8,6 +9,8 @@ AllCops:
     - 'lib/fhir_models/fhirpath/evaluate.rb'
     - 'lib/fhir_models/r4/generated/**/*'
     - 'lib/fhir_models/r4b/generated/**/*'
+    - 'lib/fhir_models/bootstrap/*'
+    - 'xml_script.rb'
     - 'lib/**/*.rake'
     - 'tmp/**/*'
     - '*.gemspec'
