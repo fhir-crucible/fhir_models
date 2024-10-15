@@ -17,6 +17,7 @@ Gem::Specification.new do |spec|
   spec.files         = `git ls-files -z lib LICENSE`.split("\x0")
   spec.files.reject! { |file| file =~ /lib\/fhir_models\/examples|lib\/fhir_models\/definitions/}
   spec.files.reject! { |file| file =~ /lib\/fhir_models\/igs\/hl7.fhir..*\.core\/package_supplement\/expansions.json/}
+  spec.files.reject! { |file| file =~ /.*\.tgz$/}
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
